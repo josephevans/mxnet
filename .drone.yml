@@ -15,6 +15,10 @@ steps:
   image: drone/git
   commands:
   - git submodule update --init --recursive --jobs $(nproc) 
+- name: fetch-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh pull ${DRONE_STAGE_NAME}
 
 
 
@@ -329,6 +333,6 @@ trigger:
 
 ---
 kind: signature
-hmac: 8a5a08984d3a393ec8718b9bd9241afe0bfc2488862429dc12847082f3ed0afa
+hmac: f8e3b73d28f1cb2bce20cfb256c549b809e24d532d1557cf49a21228110b44d2
 
 ...
