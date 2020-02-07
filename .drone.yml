@@ -12,25 +12,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache /drone/src/ccache --no-progress
-    --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j8
   - ccache -s
@@ -41,7 +37,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/sanity
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -49,19 +45,21 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
-  - cd python && pip install -e . && cd ..
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
+  - pip install -e python
+  - pip install -r tests/requirements.txt
   - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/sanity
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/sanity-ccache --delete
-    --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -87,25 +85,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-openblas-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_cpu_openblas
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -115,7 +109,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -123,13 +117,17 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
+  - pip install -r tests/requirements.txt
+  - pip install -e python
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -137,6 +135,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
     /root/.m2
   - cd scala-package
@@ -146,7 +146,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-scala-prep
 - commands:
   - . /ci/setup_test_env.sh
@@ -154,6 +154,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
     /root/.m2
   - cd scala-package
@@ -163,7 +165,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-scala
 - commands:
   - . /ci/setup_test_env.sh
@@ -171,13 +173,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_cpu_clojure
   depends_on:
   - test-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-clojure
 - commands:
   - . /ci/setup_test_env.sh
@@ -185,13 +189,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_cpu_clojure_integration
   depends_on:
   - test-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-clojure-integration
 - commands:
   - . /ci/setup_test_env.sh
@@ -199,13 +205,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-perl
 - commands:
   - . /ci/setup_test_env.sh
@@ -213,6 +221,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - apt-get update
   - apt-get -y install libcurl4-gnutls-dev
   - /work/runtime_functions.sh unittest_ubuntu_cpu_R
@@ -221,7 +231,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-r
 - commands:
   - . /ci/setup_test_env.sh
@@ -229,13 +239,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_cpu_julia07
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-julia-0.7
 - commands:
   - . /ci/setup_test_env.sh
@@ -243,13 +255,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_cpu_julia10
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-julia-1.0
 - commands:
   - . /ci/setup_test_env.sh
@@ -257,18 +271,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-onnx
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -294,25 +309,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-openblas-debug-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_cpu_cmake_debug
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -330,6 +341,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
@@ -344,6 +357,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - build/tests/mxnet_unit_tests
   depends_on:
   - compile
@@ -354,8 +369,7 @@ steps:
   name: test-cpp
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-debug-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -381,25 +395,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-mkl-ccache /drone/src/ccache --no-progress
-    --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_cpu_mkl
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -417,6 +427,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
@@ -427,8 +439,7 @@ steps:
   name: test-python3
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkl-ccache --delete
-    --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -454,25 +465,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_cpu_mkldnn
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -490,6 +497,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile
@@ -504,6 +513,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
   depends_on:
   - compile
@@ -518,6 +529,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_minimal_R
   depends_on:
   - compile
@@ -528,8 +541,7 @@ steps:
   name: test-r
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -555,25 +567,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-mkl-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_cpu_mkldnn_mkl
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -591,6 +599,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile
@@ -601,8 +611,7 @@ steps:
   name: test-python3
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-mkl-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -628,25 +637,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-int64-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_cpu_large_tensor
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -660,8 +665,7 @@ steps:
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-int64-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -687,25 +691,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-openblas-no-tvm-op-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_cpu_cmake_no_tvm_op
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -723,6 +723,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
@@ -733,8 +735,7 @@ steps:
   name: test-python3
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-no-tvm-op-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -760,25 +761,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-static-scala-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_static_scala_cpu
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -792,8 +789,7 @@ steps:
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-static-scala-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -819,25 +815,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-static-python-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_static_python_cpu
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -851,8 +843,7 @@ steps:
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-static-python-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -878,25 +869,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-static-python-cmake-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_static_python_cpu_cmake
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -910,8 +897,7 @@ steps:
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-static-python-cmake-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -937,25 +923,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_mkldnn
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -965,7 +947,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -973,18 +955,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_gpu
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1010,25 +993,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-nocudnn-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_mkldnn_nocudnn
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1038,7 +1017,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1046,18 +1025,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_nocudnn
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-nocudnn-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1083,25 +1063,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-full-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1111,7 +1087,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1119,13 +1095,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -1133,13 +1111,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_quantization_gpu
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3-quantize
 - commands:
   - . /ci/setup_test_env.sh
@@ -1147,13 +1127,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-perl
 - commands:
   - . /ci/setup_test_env.sh
@@ -1161,13 +1143,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_gpu_R
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-r
 - commands:
   - . /ci/setup_test_env.sh
@@ -1175,13 +1159,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh integrationtest_ubuntu_gpu_python
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3-integration
 - commands:
   - . /ci/setup_test_env.sh
@@ -1189,13 +1175,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh integrationtest_ubuntu_gpu_cpp_package
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp-package
 - commands:
   - . /ci/setup_test_env.sh
@@ -1203,13 +1191,15 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh integrationtest_ubuntu_gpu_scala
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-scala
 - commands:
   - . /ci/setup_test_env.sh
@@ -1217,18 +1207,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh integrationtest_ubuntu_gpu_dist_kvstore
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-distributed-kvstore
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-full-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1254,25 +1245,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-cmake-mkldnn-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_cmake_mkldnn
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1282,7 +1269,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1290,18 +1277,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-mkldnn-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1327,25 +1315,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-cmake-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_cmake
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1355,7 +1339,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1363,18 +1347,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1400,25 +1385,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-tensorrt-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_tensorrt
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1428,7 +1409,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1436,18 +1417,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_tensorrt_gpu
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-tensorrt-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1473,25 +1455,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-int64-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_large_tensor
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1501,12 +1479,11 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-int64
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-int64-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1532,25 +1509,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-no-tvm-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_no_tvm_op
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1560,7 +1533,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1568,18 +1541,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-no-tvm-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1605,25 +1579,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-tvm-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1633,12 +1603,11 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-tvm
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-tvm-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1664,25 +1633,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-rtc-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1692,12 +1657,11 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-rtc
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-rtc-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1723,25 +1687,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-cpp-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_mkldnn_cpp_test
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1751,7 +1711,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1759,18 +1719,19 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh integrationtest_ubuntu_gpu_capi_cpp_package
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-capi-cpp-package
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-cpp-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1796,25 +1757,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-static-python-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_static_python_cu101
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1824,12 +1781,11 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-static-python
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-static-python-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1855,25 +1811,21 @@ platform:
   os: linux
 steps:
 - commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-static-python-cmake-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
+  - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
   - ls -liaF
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - find / -name libcuda.so.1
   - /work/runtime_functions.sh build_static_python_cu101_cmake
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1883,12 +1835,11 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-gpu-static-python-cmake
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-static-python-cmake-ccache
-    --delete --no-progress --size-only --quiet || true
+  - /ci/cleanup_ccache.sh
   depends_on:
   - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -1900,6 +1851,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 3387eaaacd40b724f1d12ca5036feee89e7b2dcaf0176bc747bec0cba2df379d
+hmac: aac6bc45d6f4ee430c418b354be96b9b4e2e26ceab230642a8660a2e180202f2
 
 ...
