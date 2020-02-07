@@ -16,10 +16,86 @@ steps:
   commands:
   - git submodule update --init --recursive --jobs $(nproc) 
 
-- name: fetch-ccache
+
+
+
+
+# compile_unix_cpu_openblas
+- name: fetch-ccache-unix-cpu-openblas
   image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
   commands:
-  - /bin/cache_sync.sh pull cpu
+  - /bin/cache_sync.sh pull ${DRONE_STAGE_NAME}
+- name: build-unix-cpu-openblas
+  image: mxnetci/build.ubuntu_cpu
+  commands:
+  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j16
+  - make cython PYTHON=python3
+  environment:
+    CCACHE_MAXSIZE: 10G
+    CCACHE_TEMPDIR: /tmp/ccache
+    CCACHE_DIR: /drone/src/.ccache
+  depends_on:
+  - fetch-submodules
+  - fetch-ccache-unix-cpu-openblas
+
+
+# compile_unix_openblas_debug_cpu
+- name: fetch-ccache-unix-cpu-openblas-debug
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh pull unix-cpu-openblas-debug
+- name: build-unix-cpu-openblas-debug
+  image: mxnetci/build.ubuntu_cpu
+  commands:
+  - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug -G Ninja .
+  - ninja -v
+  environment:
+    CCACHE_MAXSIZE: 10G
+    CCACHE_TEMPDIR: /tmp/ccache
+    CCACHE_DIR: /drone/src/.ccache
+  depends_on:
+  - fetch-submodules
+  - fetch-ccache-unix-cpu-openblas-debug
+
+# compile_unix_mkl_cpu
+- name: fetch-ccache-unix-cpu-mkl
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh pull unix-cpu-mkl
+- name: build-unix-cpu-mkl
+  image: mxnetci/build.ubuntu_cpu
+  commands:
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j16
+  environment:
+    CCACHE_MAXSIZE: 10G
+    CCACHE_TEMPDIR: /tmp/ccache
+    CCACHE_DIR: /drone/src/.ccache
+  depends_on:
+  - fetch-submodules
+  - fetch-ccache-unix-cpu-mkl
+
+# compile_unix_mkldnn_cpu
+- name: fetch-ccache-unix-cpu-mkldnn
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh pull unix-cpu-mkldnn
+- name: build-unix-cpu-mkldnn
+  image: mxnetci/build.ubuntu_cpu
+  commands:
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 -j16
+  environment:
+    CCACHE_MAXSIZE: 10G
+    CCACHE_TEMPDIR: /tmp/ccache
+    CCACHE_DIR: /drone/src/.ccache
+  depends_on:
+  - fetch-submodules
+  - fetch-ccache-unix-cpu-mkldnn
+
+
+# compile_unix_mkldnn_mkl_cpu(),
+# compile_unix_int64_cpu(),
+# compile_unix_openblas_cpu_no_tvm_op(),
+
 
 - name: build
   image: mxnetci/build.ubuntu_cpu
@@ -37,6 +113,27 @@ steps:
   - fetch-submodules
   - fetch-ccache
 
+# test_unix_python3_cpu(),
+# test_unix_python3_debug_cpu(),
+# test_unix_python3_mkl_cpu(),
+# test_unix_python3_mkldnn_cpu(),
+# test_unix_python3_mkldnn_mkl_cpu(),
+# test_unix_scala_cpu(),
+# test_unix_scala_mkldnn_cpu(),
+# test_unix_clojure_cpu(),
+# test_unix_clojure_integration_cpu(),
+# test_unix_perl_cpu(),
+# test_unix_r_cpu(),
+# test_unix_r_mkldnn_cpu(),
+# test_unix_julia07_cpu(),
+# test_unix_julia10_cpu(),
+# test_unix_onnx_cpu(),
+# test_unix_cpp_cpu(),
+# test_static_scala_cpu(),
+# test_static_python_cpu(),
+# test_unix_python3_cpu_no_tvm_op(),
+
+
 - name: test
   image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/drone-mxnet-ci:latest
   commands:
@@ -46,13 +143,17 @@ steps:
   - MXNET_TEST_COUNT=1 nosetests --nocapture --verbose tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - build
+  - build-unix-cpu-openblas
+  - build-unix-cpu-openblas-debug
+  - build-unix-cpu-mkl
+  - build-unix-cpu-mkldnn
     
-- name: push-ccache
-  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
-  commands:
-  - /bin/cache_sync.sh push cpu
-  depends_on:
-  - build
+#- name: push-ccache
+#  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+#  commands:
+#  - /bin/cache_sync.sh push cpu
+#  depends_on:
+#  - build
 
 image_pull_secrets:
 - dockerconfigjson
@@ -228,6 +329,6 @@ trigger:
 
 ---
 kind: signature
-hmac: af908ae74935ee273e19f3ec0e79222f5ea51578790da68c74e7849303309980
+hmac: 8a5a08984d3a393ec8718b9bd9241afe0bfc2488862429dc12847082f3ed0afa
 
 ...
