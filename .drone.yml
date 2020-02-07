@@ -1,0 +1,233 @@
+---
+kind: pipeline
+type: docker
+name: mxnet-build-ubuntu-cpu-release
+
+platform:
+  os: linux
+  arch: amd64
+
+node:
+  hw: cpu
+
+steps:
+- name: fetch-submodules
+  image: drone/git
+  commands:
+  - git submodule update --init --recursive --jobs $(nproc) 
+
+- name: fetch-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh pull cpu
+
+- name: build
+  image: mxnetci/build.ubuntu_cpu
+  commands:
+  - set
+  - ccache -s
+  - ccache --zero-stats
+  - make DEV=0 ENABLE_TESTCOVERAGE=0 USE_CPP_PACKAGE=0 USE_MKLDNN=0 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 -j16
+  - ccache -s
+  environment:
+    CCACHE_MAXSIZE: 10G
+    CCACHE_TEMPDIR: /tmp/ccache
+    CCACHE_DIR: /drone/src/.ccache
+  depends_on:
+  - fetch-submodules
+  - fetch-ccache
+
+- name: test
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/drone-mxnet-ci:latest
+  commands:
+  - cd python/
+  - pip install -e .
+  - cd ..
+  - MXNET_TEST_COUNT=1 nosetests --nocapture --verbose tests/python/unittest/test_operator.py:test_norm
+  depends_on:
+  - build
+    
+- name: push-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh push cpu
+  depends_on:
+  - build
+
+image_pull_secrets:
+- dockerconfigjson
+
+trigger:
+  event:
+  - pull_request
+  - push
+  - cron
+
+
+---
+kind: pipeline
+type: docker
+name: mxnet-build-ubuntu-cpu-mkldnn-release
+
+platform:
+  os: linux
+  arch: amd64
+
+node:
+  hw: cpu
+
+steps:
+- name: fetch-submodules
+  image: drone/git
+  commands:
+  - git submodule update --init --recursive --jobs $(nproc) 
+
+- name: fetch-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh pull cpu-mkldnn
+
+- name: build
+  image: mxnetci/build.ubuntu_cpu
+  commands:
+  - ccache -s
+  - ccache --zero-stats
+  - make DEV=0 ENABLE_TESTCOVERAGE=0 USE_CPP_PACKAGE=0 USE_MKLDNN=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 -j16
+  - ccache -s
+  environment:
+    CCACHE_MAXSIZE: 10G
+    CCACHE_TEMPDIR: /tmp/ccache
+    CCACHE_DIR: /drone/src/.ccache
+  depends_on:
+  - fetch-submodules
+  - fetch-ccache
+
+- name: push-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh push cpu-mkldnn
+  depends_on:
+  - build
+
+image_pull_secrets:
+- dockerconfigjson
+
+trigger:
+  event:
+  - pull_request
+  - push
+
+
+---
+kind: pipeline
+type: docker
+name: mxnet-build-ubuntu-gpu-release
+
+platform:
+  os: linux
+  arch: amd64
+
+node:
+  hw: gpu
+
+steps:
+- name: fetch-submodules
+  image: drone/git
+  commands:
+  - git submodule update --init --recursive --jobs $(nproc) 
+
+- name: fetch-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh pull gpu
+
+- name: build
+  image: mxnetci/build.ubuntu_gpu_cu102
+  commands:
+  - ccache -s
+  - ccache --zero-stats
+  - make CUDA_ARCH="-gencode arch=compute_75,code=[sm_75,compute_75] --fatbin-options -compress-all" DEV=0 ENABLE_TESTCOVERAGE=0 USE_CPP_PACKAGE=0 USE_MKLDNN=0 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 USE_CUDA=1 USE_CUDA_PATH=/usr/local/cuda USE_CUDNN=1 USE_DIST_KVSTORE=1 -j16
+  - ccache -s
+  environment:
+    CCACHE_MAXSIZE: 10G
+    CCACHE_TEMPDIR: /tmp/ccache
+    CCACHE_DIR: /drone/src/.ccache
+  depends_on:
+  - fetch-submodules
+  - fetch-ccache
+
+- name: push-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh push gpu
+  depends_on:
+  - build
+
+image_pull_secrets:
+- dockerconfigjson
+
+trigger:
+  event:
+  - pull_request
+  - push
+
+
+---
+kind: pipeline
+type: docker
+name: mxnet-build-ubuntu-gpu-mkldnn-release
+
+platform:
+  os: linux
+  arch: amd64
+
+node:
+  hw: gpu
+
+steps:
+- name: fetch-submodules
+  image: drone/git
+  commands:
+  - git submodule update --init --recursive --jobs $(nproc) 
+
+- name: fetch-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh pull gpu-mkldnn
+
+- name: build
+  image: mxnetci/build.ubuntu_gpu_cu102
+  commands:
+  - ccache -s
+  - ccache --zero-stats
+  - make CUDA_ARCH="-gencode arch=compute_75,code=[sm_75,compute_75] --fatbin-options -compress-all" DEV=0 ENABLE_TESTCOVERAGE=0 USE_CPP_PACKAGE=0 USE_MKLDNN=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 USE_CUDA=1 USE_CUDA_PATH=/usr/local/cuda USE_CUDNN=1 USE_DIST_KVSTORE=1 -j16
+  - ccache -s
+  environment:
+    CCACHE_MAXSIZE: 10G
+    CCACHE_TEMPDIR: /tmp/ccache
+    CCACHE_DIR: /drone/src/.ccache
+  depends_on:
+  - fetch-submodules
+  - fetch-ccache
+
+- name: push-ccache
+  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
+  commands:
+  - /bin/cache_sync.sh push gpu-mkldnn
+  depends_on:
+  - build
+
+image_pull_secrets:
+- dockerconfigjson
+
+trigger:
+  event:
+  - pull_request
+  - push
+  - cron
+
+---
+kind: signature
+hmac: af908ae74935ee273e19f3ec0e79222f5ea51578790da68c74e7849303309980
+
+...
