@@ -259,10 +259,9 @@ def main():
         if 'MKL_ROOT' not in os.environ:
             os.environ["MKL_ROOT"] = "C:\\Program Files (x86)\\IntelSWTools\\compilers_and_libraries\\windows\\mkl"
         if not args.vcvars:
-            for k in KNOWN_VCVARS.keys():
+            for k in sorted(KNOWN_VCVARS.keys()):
                 if os.path.exists(KNOWN_VCVARS[k]):
                     args.vcvars = KNOWN_VCVARS[k]
-                    break
 
         windows_build(args)
 
