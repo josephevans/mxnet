@@ -19,7 +19,7 @@ steps:
 - name: clone-src
   image: drone/git
   commands:
-  - mkdir -p tmp && cd tmp && /usr/local/bin/clone
+  - mkdir -p tmp && cd tmp && /usr/local/bin/clone-commit
   - git submodule update --init --recursive
   - ls -liaF
 
