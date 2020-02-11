@@ -54,13 +54,14 @@ steps:
 - name: build-unix-cpu-openblas-debug
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cd build-unix-cpu-openblas-debug
+  - cp -r orig $${BUILD_NAME} && mkdir -p $${BUILD_NAME}/.ccache $${BUILD_NAME}/.ccache-tmp && cd $${BUILD_NAME}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug -G Ninja .
   - ninja -v
   environment:
     CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /tmp/ccache
-    CCACHE_DIR: /drone/src/.ccache
+    CCACHE_TEMPDIR: .ccache-tmp
+    CCACHE_DIR: .ccache
+    BUILD_NAME: unix-cpu-openblas-debug
   depends_on:
   - clone-src
   - fetch-ccache-unix-cpu-openblas-debug
@@ -73,12 +74,13 @@ steps:
 - name: build-unix-cpu-mkl
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cd build-unix-cpu-mkl
+  - cp -r orig $${BUILD_NAME} && mkdir -p $${BUILD_NAME}/.ccache $${BUILD_NAME}/.ccache-tmp && cd $${BUILD_NAME}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j16
   environment:
     CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /tmp/ccache
-    CCACHE_DIR: /drone/src/.ccache
+    CCACHE_TEMPDIR: .ccache-tmp
+    CCACHE_DIR: .ccache
+    BUILD_NAME: unix-cpu-mkl
   depends_on:
   - clone-src
   - fetch-ccache-unix-cpu-mkl
@@ -91,12 +93,13 @@ steps:
 - name: build-unix-cpu-mkldnn
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cd build-unix-cpu-mkldnn
+  - cp -r orig $${BUILD_NAME} && mkdir -p $${BUILD_NAME}/.ccache $${BUILD_NAME}/.ccache-tmp && cd $${BUILD_NAME}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 -j16
   environment:
     CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /tmp/ccache
-    CCACHE_DIR: /drone/src/.ccache
+    CCACHE_TEMPDIR: .ccache-tmp
+    CCACHE_DIR: .ccache
+    BUILD_NAME: unix-cpu-mkldnn
   depends_on:
   - clone-src
   - fetch-ccache-unix-cpu-mkldnn
