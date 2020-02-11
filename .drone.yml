@@ -23,10 +23,14 @@ steps:
   - /usr/local/bin/clone-commit
   - git submodule update --init --recursive
   - ls -liaF
-  - cp -r ${DRONE_WORKSPACE}/orig ${DRONE_WORKSPACE}/build-unix-cpu-openblas
-  - cp -r ${DRONE_WORKSPACE}/orig ${DRONE_WORKSPACE}/build-unix-cpu-openblas-debug
-  - cp -r ${DRONE_WORKSPACE}/orig ${DRONE_WORKSPACE}/build-unix-cpu-mkl
-  - cp -r ${DRONE_WORKSPACE}/orig ${DRONE_WORKSPACE}/build-unix-cpu-mkldnn
+  - cd ..
+  - cp -r orig build-unix-cpu-openblas
+  - cp -r orig build-unix-cpu-openblas-debug
+  - cp -r orig build-unix-cpu-mkl
+  - cp -r orig build-unix-cpu-mkldnn
+  - ls -liaF
+  - rm -rf orig
+  - ls -liaF
 
 
 
