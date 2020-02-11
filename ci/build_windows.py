@@ -42,7 +42,7 @@ print("JOE PATH: %s" % (os.environ.get('PATH')))
 
 # Fix for broken PATH with newline inserted presumably by VS studio installation of SQL server or
 # other component which makes visual studio stop working.
-os.environ['PATH']=os.environ.get('PATH').replace('\n','')
+os.environ['PATH']=os.environ.get('PATH').replace('\n','') + "C:\\Program Files\\CMake\\bin;"
 
 print("JOE PATH: %s" % (os.environ.get('PATH')))
 
