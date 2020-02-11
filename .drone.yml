@@ -10,11 +10,18 @@ platform:
 node:
   hw: cpu
 
+clone:
+  disable: true
+
+
+
 steps:
-- name: fetch-submodules
+- name: clone
   image: drone/git
   commands:
-  - git submodule update --init --recursive --jobs $(nproc) 
+  - mkdir -p tmp && cd tmp && /usr/local/bin/clone
+  - git submodule update --init --recursive
+  - ls -liaF
 - name: fetch-ccache
   image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
   commands:
