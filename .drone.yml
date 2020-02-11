@@ -33,7 +33,7 @@ steps:
 - name: build-unix-cpu-openblas
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cp -r orig ${BUILD_NAME} && mkdir -p ${BUILD_NAME}/.ccache ${BUILD_NAME}/.ccache-tmp && cd ${BUILD_NAME}
+  - cp -r orig $${BUILD_NAME} && mkdir -p $${BUILD_NAME}/.ccache $${BUILD_NAME}/.ccache-tmp && cd $${BUILD_NAME}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j16
   - make cython PYTHON=python3
   environment:
