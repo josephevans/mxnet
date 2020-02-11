@@ -37,10 +37,14 @@ from subprocess import check_call
 
 from util import *
 
+print("JOE PATH: %s" % (os.environ.get('PATH')))
+
 
 # Fix for broken PATH with newline inserted presumably by VS studio installation of SQL server or
 # other component which makes visual studio stop working.
 os.environ['PATH']=os.environ.get('PATH').replace('\n','')
+
+print("JOE PATH: %s" % (os.environ.get('PATH')))
 
 KNOWN_VCVARS = {
     # https://gitlab.kitware.com/cmake/cmake/issues/18920
