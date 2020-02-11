@@ -22,15 +22,6 @@ steps:
   - mkdir -p orig && cd orig
   - /usr/local/bin/clone-commit
   - git submodule update --init --recursive
-  - ls -liaF
-  - cd ..
-  - cp -r orig build-unix-cpu-openblas
-  - cp -r orig build-unix-cpu-openblas-debug
-  - cp -r orig build-unix-cpu-mkl
-  - cp -r orig build-unix-cpu-mkldnn
-  - ls -liaF
-  - rm -rf orig
-  - ls -liaF
 
 
 
@@ -38,17 +29,18 @@ steps:
 - name: fetch-ccache-unix-cpu-openblas
   image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
   commands:
-  - /bin/cache_sync.sh pull ${DRONE_STEP_NAME}
+  - /bin/cache_sync.sh pull unix-cpu 
 - name: build-unix-cpu-openblas
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cd build-unix-cpu-openblas
+  - cp -r orig ${BUILD_NAME} && mkdir -p ${BUILD_NAME}/.ccache ${BUILD_NAME}/.ccache-tmp && cd ${BUILD_NAME}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j16
   - make cython PYTHON=python3
   environment:
     CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /tmp/ccache
-    CCACHE_DIR: /drone/src/.ccache
+    CCACHE_TEMPDIR: .ccache-tmp
+    CCACHE_DIR: .ccache
+    BUILD_NAME: unix-cpu-openblas
   depends_on:
   - clone-src
   - fetch-ccache-unix-cpu-openblas
