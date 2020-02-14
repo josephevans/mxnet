@@ -30,11 +30,11 @@ steps:
 - name: build-unix-cpu-openblas
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cp -r orig $${BUILD_NAME} && cd $${BUILD_NAME}
-  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1
+  - cp -r orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
   environment:
-    BUILD_NAME: unix-cpu-openblas
+    BUILD_DIR: unix-cpu-openblas
   depends_on:
   - clone-src
 
@@ -43,11 +43,11 @@ steps:
 - name: build-unix-cpu-openblas-debug
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cp -r orig $${BUILD_NAME} && cd $${BUILD_NAME}
+  - cp -r orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug -G Ninja .
   - ninja -v
   environment:
-    BUILD_NAME: unix-cpu-openblas-debug
+    BUILD_DIR: unix-cpu-openblas-debug
   depends_on:
   - clone-src
 
@@ -55,10 +55,10 @@ steps:
 - name: build-unix-cpu-mkl
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cp -r orig $${BUILD_NAME} && cd $${BUILD_NAME}
-  - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1
+  - cp -r orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
   environment:
-    BUILD_NAME: unix-cpu-mkl
+    BUILD_DIR: unix-cpu-mkl
   depends_on:
   - clone-src
 
@@ -66,10 +66,10 @@ steps:
 - name: build-unix-cpu-mkldnn
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cp -r orig $${BUILD_NAME} && cd $${BUILD_NAME}
-  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
+  - cp -r orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 -j4
   environment:
-    BUILD_NAME: unix-cpu-mkldnn
+    BUILD_DIR: unix-cpu-mkldnn
   depends_on:
   - clone-src
 
@@ -103,32 +103,32 @@ steps:
 - name: test-unix-python3-cpu
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cd $${BUILD_NAME}
+  - cd $${BUILD_DIR}
   - ls -liaF
   - find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   environment:
-    BUILD_NAME: unix-cpu-openblas
+    BUILD_DIR: unix-cpu-openblas
   depends_on:
   - build-unix-cpu-openblas
 
 - name: test-unix-python3-debug-cpu
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cd $${BUILD_NAME}
+  - cd $${BUILD_DIR}
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   environment:
-    BUILD_NAME: unix-cpu-openblas-debug
+    BUILD_DIR: unix-cpu-openblas-debug
   depends_on:
   - build-unix-cpu-openblas-debug
 
 - name: test-unix-python3-mkl-cpu
   image: mxnetci/build.ubuntu_cpu
   commands:
-  - cd $${BUILD_NAME}
+  - cd $${BUILD_DIR}
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   environment:
-    BUILD_NAME: unix-cpu-mkl
+    BUILD_DIR: unix-cpu-mkl
   depends_on:
   - build-unix-cpu-mkl
 
@@ -144,6 +144,6 @@ trigger:
 
 ---
 kind: signature
-hmac: 0746f6dda47c67d07d04aa60df960584ba587f0908520ef30ab4fae65464694a
+hmac: 07fb7652e1d4a7024bcf9f106415f6b8ad9a12ea413eeb949b0566755dc85579
 
 ...
