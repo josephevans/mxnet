@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: docker
-name: mxnet-build-ubuntu-cpu-release
+name: mxnet-build-unix-cpu-release
 
 platform:
   os: linux
@@ -100,25 +100,36 @@ steps:
 # test_unix_python3_cpu_no_tvm_op(),
 
 
-- name: test
-  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/drone-mxnet-ci:latest
+- name: test-unix-python3-cpu
+  image: mxnetci/build.ubuntu_cpu
   commands:
-  - cd python/
-  - pip install -e .
-  - cd ..
-  - MXNET_TEST_COUNT=1 nosetests --nocapture --verbose tests/python/unittest/test_operator.py:test_norm
+  - cd $${BUILD_NAME}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  environment:
+    BUILD_NAME: unix-cpu-openblas
   depends_on:
   - build-unix-cpu-openblas
+
+- name: test-unix-python3-debug-cpu
+  image: mxnetci/build.ubuntu_cpu
+  commands:
+  - cd $${BUILD_NAME}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  environment:
+    BUILD_NAME: unix-cpu-openblas-debug
+  depends_on:
   - build-unix-cpu-openblas-debug
+
+- name: test-unix-python3-mkl-cpu
+  image: mxnetci/build.ubuntu_cpu
+  commands:
+  - cd $${BUILD_NAME}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  environment:
+    BUILD_NAME: unix-cpu-mkl
+  depends_on:
   - build-unix-cpu-mkl
-  - build-unix-cpu-mkldnn
-    
-#- name: push-ccache
-#  image: 120448866817.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci-ccache
-#  commands:
-#  - /bin/cache_sync.sh push cpu
-#  depends_on:
-#  - build
+
 
 image_pull_secrets:
 - dockerconfigjson
