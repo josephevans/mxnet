@@ -104,6 +104,8 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   commands:
   - cd $${BUILD_NAME}
+  - ls -liaF
+  - find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   environment:
     BUILD_NAME: unix-cpu-openblas
@@ -142,6 +144,6 @@ trigger:
 
 ---
 kind: signature
-hmac: 4aa1aac41b092eb4ab548cf60e13e02b179db4987200b26d1f48fd68a16ad564
+hmac: 0746f6dda47c67d07d04aa60df960584ba587f0908520ef30ab4fae65464694a
 
 ...
