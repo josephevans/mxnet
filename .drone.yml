@@ -31,7 +31,7 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   commands:
   - cp -r orig $${BUILD_NAME} && cd $${BUILD_NAME}
-  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j16
+  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1
   - make cython PYTHON=python3
   environment:
     BUILD_NAME: unix-cpu-openblas
@@ -56,7 +56,7 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   commands:
   - cp -r orig $${BUILD_NAME} && cd $${BUILD_NAME}
-  - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j16
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1
   environment:
     BUILD_NAME: unix-cpu-mkl
   depends_on:
@@ -67,7 +67,7 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   commands:
   - cp -r orig $${BUILD_NAME} && cd $${BUILD_NAME}
-  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 -j16
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
   environment:
     BUILD_NAME: unix-cpu-mkldnn
   depends_on:
@@ -142,6 +142,6 @@ trigger:
 
 ---
 kind: signature
-hmac: 8eacba97568e44d7457cd3a9af815e7b6863ca4fd06054c835429caea417ead6
+hmac: 4aa1aac41b092eb4ab548cf60e13e02b179db4987200b26d1f48fd68a16ad564
 
 ...
