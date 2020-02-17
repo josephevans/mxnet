@@ -1,6 +1,8 @@
 ---
 clone:
   disable: true
+image_pull_secrets:
+- dockerconfigjson
 kind: pipeline
 name: sanity
 node:
@@ -52,6 +54,8 @@ clone:
   disable: true
 depends_on:
 - sanity
+image_pull_secrets:
+- dockerconfigjson
 kind: pipeline
 name: unix-cpu
 node:
@@ -227,6 +231,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: fe359bcd34fbbefe7cefd4315357f43483859a3acf9e03330c30ed1ed84e0ef4
+hmac: e1a34a56d47a2d06a6b5ecdfa2baef629d52919b41b5bdd39f8dd325753aebad
 
 ...
