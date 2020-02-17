@@ -15,8 +15,10 @@ steps:
   - mkdir -p src.orig && cd src.orig
   - /usr/local/bin/clone-commit
   - git submodule update --init --recursive
+  - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache /drone/src/ccache --no-progress
-  - cd .. && ls -liaF && du -hs *
+    --quiet
+  - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
@@ -40,9 +42,7 @@ steps:
   name: compile-basic
 - commands:
   - cd $${BUILD_DIR}
-  - cd python
-  - pip install -e .
-  - cd ..
+  - cd python && pip install -e . && cd ..
   - MXNET_TEST_COUNT=1 nosetests --nocapture --verbose tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - compile-basic
@@ -54,7 +54,7 @@ steps:
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/sanity-ccache --delete
-    --no-progress
+    --no-progress --quiet
   depends_on:
   - test-basic-python
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -79,8 +79,10 @@ steps:
   - mkdir -p src.orig && cd src.orig
   - /usr/local/bin/clone-commit
   - git submodule update --init --recursive
+  - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache /drone/src/ccache --no-progress
-  - cd .. && ls -liaF && du -hs *
+    --quiet
+  - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
@@ -90,7 +92,7 @@ steps:
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j2
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
   - ccache -s
   depends_on:
@@ -119,7 +121,7 @@ steps:
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j2
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
   - ccache -s
   depends_on:
@@ -148,7 +150,8 @@ steps:
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
-    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j2
+    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
+  - make cython PYTHON=python3
   - ccache -s
   depends_on:
   - clone-src
@@ -176,7 +179,8 @@ steps:
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
-    -j2
+    -j4
+  - make cython PYTHON=python3
   - ccache -s
   depends_on:
   - clone-src
@@ -204,7 +208,8 @@ steps:
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
-    -j2
+    -j4
+  - make cython PYTHON=python3
   - ccache -s
   depends_on:
   - clone-src
@@ -233,7 +238,8 @@ steps:
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja
-  - ninja -v -j 2
+  - ninja -v -j 4
+  - make cython PYTHON=python3
   - ccache -s
   depends_on:
   - clone-src
@@ -263,7 +269,8 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja
-  - ninja -v -j 2
+  - ninja -v -j 4
+  - make cython PYTHON=python3
   - ccache -s
   depends_on:
   - clone-src
@@ -287,7 +294,7 @@ steps:
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete
-    --no-progress
+    --no-progress --quiet
   depends_on:
   - test-openblas-python3
   - test-openblas-debug-python3
@@ -301,6 +308,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 4acd828072eadf019edc5bf3fd0734a17e707dc6f91ab66fb1a8cf091bb60da7
+hmac: 8c42eea005ccfc819102440cf8d60f1f77fd62a61724a087e0afbc29b2707472
 
 ...
