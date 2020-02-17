@@ -24,7 +24,8 @@ steps:
   name: clone-src
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - . drone-build.env
+  - ls -liaF
+  - . ./drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -87,7 +88,8 @@ steps:
   name: clone-src
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - . drone-build.env
+  - ls -liaF
+  - . ./drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -114,7 +116,8 @@ steps:
   name: test-openblas-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - . drone-build.env
+  - ls -liaF
+  - . ./drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -141,7 +144,8 @@ steps:
   name: test-openblas-debug-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - . drone-build.env
+  - ls -liaF
+  - . ./drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
@@ -168,7 +172,8 @@ steps:
   name: test-mkl-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - . drone-build.env
+  - ls -liaF
+  - . ./drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
@@ -195,7 +200,8 @@ steps:
   name: test-mkldnn-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - . drone-build.env
+  - ls -liaF
+  - . ./drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
@@ -222,7 +228,8 @@ steps:
   name: test-mkldnn-mkl-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - . drone-build.env
+  - ls -liaF
+  - . ./drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
@@ -250,7 +257,8 @@ steps:
   name: test-int64-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - . drone-build.env
+  - ls -liaF
+  - . ./drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
@@ -294,6 +302,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: e431768e036daee64da09bdc536430ec5885533bd9ed9a5211d3c54921704f4c
+hmac: 880633c0a57110bcc77414d3ea133c6c0e44a773f6b82535452799d76d758949
 
 ...
