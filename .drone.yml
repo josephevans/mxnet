@@ -18,13 +18,13 @@ steps:
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache /drone/src/ccache --no-progress
     --quiet
+  - /usr/local/bin/ccache_setup.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - /work/runtime_functions.sh build_ccache_wrappers
-  - PATH=/tmp/ccache-redirects:$$PATH
+  - . drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -36,7 +36,6 @@ steps:
   environment:
     BUILD_DIR: sanity-basic
     CCACHE_DIR: /drone/src/ccache/sanity-basic
-    CCACHE_MAXSIZE: 10G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
   image: mxnetci/build.ubuntu_cpu
   name: compile-basic
@@ -82,13 +81,13 @@ steps:
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache /drone/src/ccache --no-progress
     --quiet
+  - /usr/local/bin/ccache_setup.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - /work/runtime_functions.sh build_ccache_wrappers
-  - PATH=/tmp/ccache-redirects:$$PATH
+  - . drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -100,7 +99,6 @@ steps:
   environment:
     BUILD_DIR: unix-cpu-openblas
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas
@@ -116,8 +114,7 @@ steps:
   name: test-openblas-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - /work/runtime_functions.sh build_ccache_wrappers
-  - PATH=/tmp/ccache-redirects:$$PATH
+  - . drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -129,7 +126,6 @@ steps:
   environment:
     BUILD_DIR: unix-cpu-openblas-debug
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
-    CCACHE_MAXSIZE: 10G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas-debug
@@ -145,8 +141,7 @@ steps:
   name: test-openblas-debug-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - /work/runtime_functions.sh build_ccache_wrappers
-  - PATH=/tmp/ccache-redirects:$$PATH
+  - . drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
@@ -158,7 +153,6 @@ steps:
   environment:
     BUILD_DIR: unix-cpu-mkl
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
-    CCACHE_MAXSIZE: 10G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkl
@@ -174,8 +168,7 @@ steps:
   name: test-mkl-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - /work/runtime_functions.sh build_ccache_wrappers
-  - PATH=/tmp/ccache-redirects:$$PATH
+  - . drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
@@ -187,7 +180,6 @@ steps:
   environment:
     BUILD_DIR: unix-cpu-mkldnn
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
-    CCACHE_MAXSIZE: 10G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkldnn
@@ -203,8 +195,7 @@ steps:
   name: test-mkldnn-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - /work/runtime_functions.sh build_ccache_wrappers
-  - PATH=/tmp/ccache-redirects:$$PATH
+  - . drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
@@ -216,7 +207,6 @@ steps:
   environment:
     BUILD_DIR: unix-cpu-mkldnn-mkl
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
-    CCACHE_MAXSIZE: 10G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkldnn-mkl
@@ -232,8 +222,7 @@ steps:
   name: test-mkldnn-mkl-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - /work/runtime_functions.sh build_ccache_wrappers
-  - PATH=/tmp/ccache-redirects:$$PATH
+  - . drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
@@ -246,7 +235,6 @@ steps:
   environment:
     BUILD_DIR: unix-cpu-int64
     CCACHE_DIR: /drone/src/ccache/unix-cpu-int64
-    CCACHE_MAXSIZE: 10G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-int64
   image: mxnetci/build.ubuntu_cpu
   name: compile-int64
@@ -262,8 +250,7 @@ steps:
   name: test-int64-python3
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - /work/runtime_functions.sh build_ccache_wrappers
-  - PATH=/tmp/ccache-redirects:$$PATH
+  - . drone-build.env
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
@@ -277,7 +264,6 @@ steps:
   environment:
     BUILD_DIR: unix-cpu-openblas-no-tvm-op
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
-    CCACHE_MAXSIZE: 10G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas-no-tvm-op
@@ -308,6 +294,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 8c42eea005ccfc819102440cf8d60f1f77fd62a61724a087e0afbc29b2707472
+hmac: e431768e036daee64da09bdc536430ec5885533bd9ed9a5211d3c54921704f4c
 
 ...
