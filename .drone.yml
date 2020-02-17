@@ -15,7 +15,10 @@ steps:
   - mkdir -p src.orig && cd src.orig
   - /usr/local/bin/clone-commit
   - git submodule update --init --recursive
-  - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache ccache --no-progress --quiet
+  - cd .. && aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache ccache --no-progress
+    --quiet
+  - ls -liaF
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
@@ -48,6 +51,8 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-basic-python
 - commands:
+  - ls -liaF
+  - du -hs *
   - aws s3 sync ccache s3://mxnet-ci-drone-ccache/sanity-ccache --delete --no-progress
     --quiet
   depends_on:
@@ -74,7 +79,10 @@ steps:
   - mkdir -p src.orig && cd src.orig
   - /usr/local/bin/clone-commit
   - git submodule update --init --recursive
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache ccache --no-progress --quiet
+  - cd .. && aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache ccache --no-progress
+    --quiet
+  - ls -liaF
+  - du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
@@ -258,6 +266,8 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
+  - ls -liaF
+  - du -hs *
   - aws s3 sync ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete --no-progress
     --quiet
   depends_on:
@@ -273,6 +283,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 25b8f854960b96cff7be5e4cda555048f2dfd2eafc71b78d8e56f8e77a758266
+hmac: c12718f6ceb1e9b2a42e73773ca908ff1647e324bd474614a11fa24a585a5fd4
 
 ...
