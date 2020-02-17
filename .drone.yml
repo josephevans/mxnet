@@ -18,7 +18,7 @@ steps:
 - commands:
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j32
   - make cython PYTHON=python3
   depends_on:
   - clone-src
@@ -207,6 +207,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 807e7bf4d460bfcc5ab5d334c98efd5fa4c48e111185c9d20133c559e0ceafec
+hmac: e7560dda9669ab4803601203e1a2deec3f504aaad4a788da030453fe341e136f
 
 ...
