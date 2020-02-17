@@ -1,149 +1,186 @@
 ---
-kind: pipeline
-type: docker
-name: mxnet-build-unix-cpu-release
-
-platform:
-  os: linux
-  arch: amd64
-
-node:
-  hw: cpu
-
 clone:
   disable: true
-
-
-
-
+kind: pipeline
+name: mxnet-build-sanity
+node:
+  hw: cpu
+platform:
+  arch: amd64
+  os: linux
 steps:
-- name: clone-src
-  image: drone/git
-  commands:
-  - mkdir -p orig && cd orig
+- commands:
+  - mkdir -p src.orig && cd src.orig
   - /usr/local/bin/clone-commit
   - git submodule update --init --recursive
-
-
-
-# compile_unix_cpu_openblas
-- name: build-unix-cpu-openblas
-  image: mxnetci/build.ubuntu_cpu
-  commands:
-  - cp -r orig $${BUILD_DIR} && cd $${BUILD_DIR}
-  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
+  image: drone/git
+  name: clone-src
+- commands:
+  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
-  environment:
-    BUILD_DIR: unix-cpu-openblas
   depends_on:
   - clone-src
-
-
-# compile_unix_openblas_debug_cpu
-- name: build-unix-cpu-openblas-debug
+  environment:
+    BUILD_DIR: sanity-openblas
   image: mxnetci/build.ubuntu_cpu
-  commands:
-  - cp -r orig $${BUILD_DIR} && cd $${BUILD_DIR}
-  - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug -G Ninja .
-  - ninja -v
+  name: compile-openblas
+- commands:
+  - cd $${BUILD_DIR}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  depends_on:
+  - compile-openblas
+  environment:
+    BUILD_DIR: sanity-openblas
+    MXNET_HOME: sanity-openblas/python/mxnet
+  image: mxnetci/build.ubuntu_cpu
+  name: test-python3
+type: docker
+---
+clone:
+  disable: true
+kind: pipeline
+name: mxnet-build-unix-cpu
+node:
+  hw: cpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  image: drone/git
+  name: clone-src
+- commands:
+  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
+  - make cython PYTHON=python3
+  depends_on:
+  - clone-src
   environment:
     BUILD_DIR: unix-cpu-openblas-debug
+  image: mxnetci/build.ubuntu_cpu
+  name: compile-openblas-debug
+- commands:
+  - cd $${BUILD_DIR}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  depends_on:
+  - compile-openblas-debug
+  environment:
+    BUILD_DIR: unix-cpu-openblas-debug
+    MXNET_HOME: unix-cpu-openblas-debug/python/mxnet
+  image: mxnetci/build.ubuntu_cpu
+  name: test-python3
+- commands:
+  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
+    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
   depends_on:
   - clone-src
-
-# compile_unix_mkl_cpu
-- name: build-unix-cpu-mkl
-  image: mxnetci/build.ubuntu_cpu
-  commands:
-  - cp -r orig $${BUILD_DIR} && cd $${BUILD_DIR}
-  - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
   environment:
     BUILD_DIR: unix-cpu-mkl
+  image: mxnetci/build.ubuntu_cpu
+  name: compile-mkl
+- commands:
+  - cd $${BUILD_DIR}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  depends_on:
+  - compile-mkl
+  environment:
+    BUILD_DIR: unix-cpu-mkl
+    MXNET_HOME: unix-cpu-mkl/python/mxnet
+  image: mxnetci/build.ubuntu_cpu
+  name: test-python3
+- commands:
+  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
+    -j4
   depends_on:
   - clone-src
-
-# compile_unix_mkldnn_cpu
-- name: build-unix-cpu-mkldnn
-  image: mxnetci/build.ubuntu_cpu
-  commands:
-  - cp -r orig $${BUILD_DIR} && cd $${BUILD_DIR}
-  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1 -j4
   environment:
     BUILD_DIR: unix-cpu-mkldnn
+  image: mxnetci/build.ubuntu_cpu
+  name: compile-mkldnn
+- commands:
+  - cd $${BUILD_DIR}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
+  depends_on:
+  - compile-mkldnn
+  environment:
+    BUILD_DIR: unix-cpu-mkldnn
+    MXNET_HOME: unix-cpu-mkldnn/python/mxnet
+  image: mxnetci/build.ubuntu_cpu
+  name: test-python3
+- commands:
+  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
+    -j4
   depends_on:
   - clone-src
-
-
-# compile_unix_mkldnn_mkl_cpu(),
-# compile_unix_int64_cpu(),
-# compile_unix_openblas_cpu_no_tvm_op(),
-
-
-# test_unix_python3_cpu(),
-# test_unix_python3_debug_cpu(),
-# test_unix_python3_mkl_cpu(),
-# test_unix_python3_mkldnn_cpu(),
-# test_unix_python3_mkldnn_mkl_cpu(),
-# test_unix_scala_cpu(),
-# test_unix_scala_mkldnn_cpu(),
-# test_unix_clojure_cpu(),
-# test_unix_clojure_integration_cpu(),
-# test_unix_perl_cpu(),
-# test_unix_r_cpu(),
-# test_unix_r_mkldnn_cpu(),
-# test_unix_julia07_cpu(),
-# test_unix_julia10_cpu(),
-# test_unix_onnx_cpu(),
-# test_unix_cpp_cpu(),
-# test_static_scala_cpu(),
-# test_static_python_cpu(),
-# test_unix_python3_cpu_no_tvm_op(),
-
-
-- name: test-unix-python3-cpu
-  image: mxnetci/build.ubuntu_cpu
-  commands:
-  - cd $${BUILD_DIR}
-  - ls -liaF
-  - find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   environment:
-    BUILD_DIR: unix-cpu-openblas
-  depends_on:
-  - build-unix-cpu-openblas
-
-- name: test-unix-python3-debug-cpu
+    BUILD_DIR: unix-cpu-mkldnn-mkl
   image: mxnetci/build.ubuntu_cpu
-  commands:
+  name: compile-mkldnn-mkl
+- commands:
+  - cd $${BUILD_DIR}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
+  depends_on:
+  - compile-mkldnn-mkl
+  environment:
+    BUILD_DIR: unix-cpu-mkldnn-mkl
+    MXNET_HOME: unix-cpu-mkldnn-mkl/python/mxnet
+  image: mxnetci/build.ubuntu_cpu
+  name: test-python3
+- commands:
+  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
+    -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja
+  - ninja -v
+  depends_on:
+  - clone-src
+  environment:
+    BUILD_DIR: unix-cpu-int64
+  image: mxnetci/build.ubuntu_cpu
+  name: compile-int64
+- commands:
   - cd $${BUILD_DIR}
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
-  environment:
-    BUILD_DIR: unix-cpu-openblas-debug
   depends_on:
-  - build-unix-cpu-openblas-debug
-
-- name: test-unix-python3-mkl-cpu
+  - compile-int64
+  environment:
+    BUILD_DIR: unix-cpu-int64
+    MXNET_HOME: unix-cpu-int64/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  commands:
+  name: test-python3
+- commands:
+  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
+    -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
+    -G Ninja
+  - ninja -v
+  depends_on:
+  - clone-src
+  environment:
+    BUILD_DIR: unix-cpu-openblas-no-tvm-op
+  image: mxnetci/build.ubuntu_cpu
+  name: compile-openblas-no-tvm-op
+- commands:
   - cd $${BUILD_DIR}
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
-  environment:
-    BUILD_DIR: unix-cpu-mkl
   depends_on:
-  - build-unix-cpu-mkl
-
-
-image_pull_secrets:
-- dockerconfigjson
-
-trigger:
-  event:
-  - pull_request
-  - push
-  - cron
-
+  - compile-openblas-no-tvm-op
+  environment:
+    BUILD_DIR: unix-cpu-openblas-no-tvm-op
+    MXNET_HOME: unix-cpu-openblas-no-tvm-op/python/mxnet
+  image: mxnetci/build.ubuntu_cpu
+  name: test-python3
+type: docker
 ---
 kind: signature
-hmac: 07fb7652e1d4a7024bcf9f106415f6b8ad9a12ea413eeb949b0566755dc85579
+hmac: 03c591dbe9db2bee41e729ffdac3a681de76d44db0c43ddbe637ef969e391951
 
 ...
