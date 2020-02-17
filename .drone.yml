@@ -22,6 +22,7 @@ steps:
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - /work/runtime_functions.sh build_ccache_wrappers
+  - PATH=/tmp/ccache-redirects:$$PATH
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -85,6 +86,7 @@ steps:
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - /work/runtime_functions.sh build_ccache_wrappers
+  - PATH=/tmp/ccache-redirects:$$PATH
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -113,6 +115,7 @@ steps:
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - /work/runtime_functions.sh build_ccache_wrappers
+  - PATH=/tmp/ccache-redirects:$$PATH
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -141,6 +144,7 @@ steps:
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - /work/runtime_functions.sh build_ccache_wrappers
+  - PATH=/tmp/ccache-redirects:$$PATH
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
@@ -168,6 +172,7 @@ steps:
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - /work/runtime_functions.sh build_ccache_wrappers
+  - PATH=/tmp/ccache-redirects:$$PATH
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
@@ -195,6 +200,7 @@ steps:
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - /work/runtime_functions.sh build_ccache_wrappers
+  - PATH=/tmp/ccache-redirects:$$PATH
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
@@ -222,6 +228,7 @@ steps:
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - /work/runtime_functions.sh build_ccache_wrappers
+  - PATH=/tmp/ccache-redirects:$$PATH
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
@@ -250,6 +257,7 @@ steps:
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - /work/runtime_functions.sh build_ccache_wrappers
+  - PATH=/tmp/ccache-redirects:$$PATH
   - set
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
@@ -293,6 +301,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 305259e8ac899136be57e3d2d699f19e7d6513d06c7171458e575e54aa777c55
+hmac: 4acd828072eadf019edc5bf3fd0734a17e707dc6f91ab66fb1a8cf091bb60da7
 
 ...
