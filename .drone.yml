@@ -2,7 +2,7 @@
 clone:
   disable: true
 kind: pipeline
-name: mxnet-build-sanity
+name: sanity
 node:
   hw: cpu
 platform:
@@ -46,7 +46,7 @@ clone:
 depends_on:
 - sanity
 kind: pipeline
-name: mxnet-build-unix-cpu
+name: unix-cpu
 node:
   hw: cpu
 platform:
@@ -207,6 +207,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: e7560dda9669ab4803601203e1a2deec3f504aaad4a788da030453fe341e136f
+hmac: 541094a493fd63ef0176993fc3a3fa6075710e9aa4615552a2cb92d75d7a4747
 
 ...
