@@ -35,7 +35,7 @@ steps:
     BUILD_DIR: sanity-openblas
     MXNET_HOME: sanity-openblas/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  name: test-python3
+  name: test-openblas-python3
 type: docker
 ---
 clone:
@@ -74,7 +74,7 @@ steps:
     BUILD_DIR: unix-cpu-openblas-debug
     MXNET_HOME: unix-cpu-openblas-debug/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  name: test-python3
+  name: test-openblas-debug-python3
 - commands:
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
@@ -94,7 +94,7 @@ steps:
     BUILD_DIR: unix-cpu-mkl
     MXNET_HOME: unix-cpu-mkl/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  name: test-python3
+  name: test-mkl-python3
 - commands:
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
@@ -114,7 +114,7 @@ steps:
     BUILD_DIR: unix-cpu-mkldnn
     MXNET_HOME: unix-cpu-mkldnn/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  name: test-python3
+  name: test-mkldnn-python3
 - commands:
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
@@ -134,7 +134,7 @@ steps:
     BUILD_DIR: unix-cpu-mkldnn-mkl
     MXNET_HOME: unix-cpu-mkldnn-mkl/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  name: test-python3
+  name: test-mkldnn-mkl-python3
 - commands:
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
@@ -155,7 +155,7 @@ steps:
     BUILD_DIR: unix-cpu-int64
     MXNET_HOME: unix-cpu-int64/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  name: test-python3
+  name: test-int64-python3
 - commands:
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
@@ -177,10 +177,10 @@ steps:
     BUILD_DIR: unix-cpu-openblas-no-tvm-op
     MXNET_HOME: unix-cpu-openblas-no-tvm-op/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  name: test-python3
+  name: test-openblas-no-tvm-op-python3
 type: docker
 ---
 kind: signature
-hmac: 03c591dbe9db2bee41e729ffdac3a681de76d44db0c43ddbe637ef969e391951
+hmac: ae121bad418745157834382ae85e76145d99582a8c2beb1a753ca5380d38c260
 
 ...
