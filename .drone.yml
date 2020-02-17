@@ -23,23 +23,28 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: sanity-openblas
+    BUILD_DIR: sanity-basic
   image: mxnetci/build.ubuntu_cpu
-  name: compile-openblas
+  name: compile-basic
 - commands:
   - cd $${BUILD_DIR}
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - cd python
+  - pip install -e .
+  - cd ..
+  - MXNET_TEST_COUNT=1 nosetests --nocapture --verbose tests/python/unittest/test_operator.py:test_norm
   depends_on:
-  - compile-openblas
+  - compile-basic
   environment:
-    BUILD_DIR: sanity-openblas
-    MXNET_HOME: sanity-openblas/python/mxnet
+    BUILD_DIR: sanity-basic
+    MXNET_HOME: sanity-basic/python/mxnet
   image: mxnetci/build.ubuntu_cpu
-  name: test-openblas-python3
+  name: test-basic-python
 type: docker
 ---
 clone:
   disable: true
+depends_on:
+- sanity
 kind: pipeline
 name: mxnet-build-unix-cpu
 node:
@@ -54,6 +59,27 @@ steps:
   - git submodule update --init --recursive
   image: drone/git
   name: clone-src
+- commands:
+  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
+  - make cython PYTHON=python3
+  depends_on:
+  - clone-src
+  environment:
+    BUILD_DIR: unix-cpu-openblas
+  image: mxnetci/build.ubuntu_cpu
+  name: compile-openblas
+- commands:
+  - cd $${BUILD_DIR}
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  depends_on:
+  - compile-openblas
+  environment:
+    BUILD_DIR: unix-cpu-openblas
+    MXNET_HOME: unix-cpu-openblas/python/mxnet
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-python3
 - commands:
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -181,6 +207,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: ae121bad418745157834382ae85e76145d99582a8c2beb1a753ca5380d38c260
+hmac: 807e7bf4d460bfcc5ab5d334c98efd5fa4c48e111185c9d20133c559e0ceafec
 
 ...
