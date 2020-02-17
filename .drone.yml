@@ -41,7 +41,7 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-basic-python
 - commands:
-  - aws s3 sync ccache s3://mxnet-ci-drone-ccache/ccache --no-progress --quiet
+  - aws s3 sync ccache s3://mxnet-ci-drone-ccache/ccache --delete --no-progress --quiet
   depends_on:
   - test-basic-python
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -213,7 +213,7 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
-  - aws s3 sync ccache s3://mxnet-ci-drone-ccache/ccache --no-progress --quiet
+  - aws s3 sync ccache s3://mxnet-ci-drone-ccache/ccache --delete --no-progress --quiet
   depends_on:
   - test-openblas-python3
   - test-openblas-debug-python3
@@ -227,6 +227,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 370f0ac8179b83bd138223307897d8f341fe156165d5286300d98e62ad60d0a0
+hmac: fe359bcd34fbbefe7cefd4315357f43483859a3acf9e03330c30ed1ed84e0ef4
 
 ...
