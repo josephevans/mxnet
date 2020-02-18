@@ -18,7 +18,7 @@ steps:
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache /drone/src/ccache --no-progress
     --quiet
-  - /usr/local/bin/ccache_setup.sh
+  - /ci/setup_build_env.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
@@ -27,6 +27,7 @@ steps:
   - ls -liaF
   - . ./drone-build.env
   - set
+  - ccache --zero-stats
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 16
@@ -82,7 +83,7 @@ steps:
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache /drone/src/ccache --no-progress
     --quiet
-  - /usr/local/bin/ccache_setup.sh
+  - /ci/setup_build_env.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
@@ -91,6 +92,7 @@ steps:
   - ls -liaF
   - . ./drone-build.env
   - set
+  - ccache --zero-stats
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
@@ -119,6 +121,7 @@ steps:
   - ls -liaF
   - . ./drone-build.env
   - set
+  - ccache --zero-stats
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
@@ -147,6 +150,7 @@ steps:
   - ls -liaF
   - . ./drone-build.env
   - set
+  - ccache --zero-stats
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
@@ -175,6 +179,7 @@ steps:
   - ls -liaF
   - . ./drone-build.env
   - set
+  - ccache --zero-stats
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j4
@@ -203,6 +208,7 @@ steps:
   - ls -liaF
   - . ./drone-build.env
   - set
+  - ccache --zero-stats
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
     -j4
@@ -231,6 +237,7 @@ steps:
   - ls -liaF
   - . ./drone-build.env
   - set
+  - ccache --zero-stats
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja
@@ -260,6 +267,7 @@ steps:
   - ls -liaF
   - . ./drone-build.env
   - set
+  - ccache --zero-stats
   - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
@@ -302,6 +310,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: c028b5bd581a95e48d14240f311118e4365495fd58a705250efe13943fe6c524
+hmac: 5f2cc7beff526512d04e077c530c76aa51447a9facc7c709c71736690504c8d7
 
 ...
