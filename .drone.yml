@@ -149,7 +149,11 @@ steps:
 - commands:
   - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_clojure
+  - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+  - cd scala-package
+  - mvn -B install
+  - cd ..
+  - ./contrib/clojure-package/ci-test.sh
   depends_on:
   - compile-openblas
   environment:
@@ -205,7 +209,13 @@ steps:
 - commands:
   - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_julia07
+  - export PATH="/work/julia07/bin:$PATH"
+  - export JULIA_DEPOT_PATH='/work/julia-depot'
+  - export INTEGRATION_TEST=1
+  - julia -e 'using InteractiveUtils; versioninfo()'
+  - julia --project=./julia -e 'using Pkg; Pkg.build("MXNet")'
+  - julia --project=./julia -e 'using Pkg; Pkg.test("MXNet")'
+  - julia --project=./julia -e 'using MXNet; mx._sig_checker()'
   depends_on:
   - compile-openblas
   environment:
@@ -219,7 +229,13 @@ steps:
 - commands:
   - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_julia10
+  - export PATH="/work/julia10/bin:$PATH"
+  - export JULIA_DEPOT_PATH='/work/julia-depot'
+  - export INTEGRATION_TEST=1
+  - julia -e 'using InteractiveUtils; versioninfo()'
+  - julia --project=./julia -e 'using Pkg; Pkg.build("MXNet")'
+  - julia --project=./julia -e 'using Pkg; Pkg.test("MXNet")'
+  - julia --project=./julia -e 'using MXNet; mx._sig_checker()'
   depends_on:
   - compile-openblas
   environment:
@@ -527,6 +543,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 6d223766a3b2c7dc1c2669ce3f2100e01e8f739ec8c4768da079bd94841bdf2a
+hmac: 4a953bab7b508ff08caff2bab17725ad4f6d7e69baa0216c03c7bafce5de4c21
 
 ...
