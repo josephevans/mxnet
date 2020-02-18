@@ -49,7 +49,8 @@ steps:
   - compile-basic
   environment:
     BUILD_DIR: sanity-basic
-    MXNET_HOME: sanity-basic/python/mxnet
+    MXNET_HOME: sanity-basic
+    MXNET_LIBRARY_PATH: /drone/src/sanity-basic/python/mxnet/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-basic-python
 - commands:
@@ -58,9 +59,12 @@ steps:
     --no-progress --quiet
   depends_on:
   - compile-basic
-  detach: true
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
 type: docker
 ---
 clone:
@@ -114,7 +118,8 @@ steps:
   - compile-openblas
   environment:
     BUILD_DIR: unix-cpu-openblas
-    MXNET_HOME: unix-cpu-openblas/python/mxnet
+    MXNET_HOME: unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/python/mxnet/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-python3
 - commands:
@@ -143,7 +148,8 @@ steps:
   - compile-openblas-debug
   environment:
     BUILD_DIR: unix-cpu-openblas-debug
-    MXNET_HOME: unix-cpu-openblas-debug/python/mxnet
+    MXNET_HOME: unix-cpu-openblas-debug
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/python/mxnet/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-debug-python3
 - commands:
@@ -172,7 +178,8 @@ steps:
   - compile-mkl
   environment:
     BUILD_DIR: unix-cpu-mkl
-    MXNET_HOME: unix-cpu-mkl/python/mxnet
+    MXNET_HOME: unix-cpu-mkl
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/python/mxnet/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-mkl-python3
 - commands:
@@ -201,7 +208,8 @@ steps:
   - compile-mkldnn
   environment:
     BUILD_DIR: unix-cpu-mkldnn
-    MXNET_HOME: unix-cpu-mkldnn/python/mxnet
+    MXNET_HOME: unix-cpu-mkldnn
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/python/mxnet/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-python3
 - commands:
@@ -230,7 +238,8 @@ steps:
   - compile-mkldnn-mkl
   environment:
     BUILD_DIR: unix-cpu-mkldnn-mkl
-    MXNET_HOME: unix-cpu-mkldnn-mkl/python/mxnet
+    MXNET_HOME: unix-cpu-mkldnn-mkl
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/python/mxnet/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-mkl-python3
 - commands:
@@ -279,7 +288,8 @@ steps:
   - compile-openblas-no-tvm-op
   environment:
     BUILD_DIR: unix-cpu-openblas-no-tvm-op
-    MXNET_HOME: unix-cpu-openblas-no-tvm-op/python/mxnet
+    MXNET_HOME: unix-cpu-openblas-no-tvm-op
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/python/mxnet/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
@@ -293,12 +303,15 @@ steps:
   - compile-mkldnn
   - compile-mkldnn-mkl
   - compile-openblas-no-tvm-op
-  detach: true
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
 type: docker
 ---
 kind: signature
-hmac: 3bf34901fe6b8ec8b26e37a2db77542d95d52e91c3a57723d83c5ae40e21043e
+hmac: 1698443820b9241303099216f054ec06d4c3794efdb641fa1b9189d0270cb3f8
 
 ...
