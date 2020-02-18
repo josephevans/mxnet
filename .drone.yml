@@ -133,6 +133,118 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-python3
 - commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
+  depends_on:
+  - compile-openblas
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-scala
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_cpu_clojure
+  depends_on:
+  - compile-openblas
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-clojure
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_cpu_clojure_integration
+  depends_on:
+  - compile-openblas
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-clojure-integration
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
+  depends_on:
+  - compile-openblas
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-perl
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_cpu_R
+  depends_on:
+  - compile-openblas
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-r
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_cpu_julia07
+  depends_on:
+  - compile-openblas
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-julia-0.7
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_cpu_julia10
+  depends_on:
+  - compile-openblas
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-julia-1.0
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
+  depends_on:
+  - compile-openblas
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-onnx
+- commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
@@ -167,6 +279,20 @@ steps:
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-debug-python3
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_cpp
+  depends_on:
+  - compile-openblas-debug
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    MXNET_HOME: /drone/src/unix-cpu-openblas-debug
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-openblas-debug-cpp
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
@@ -237,6 +363,34 @@ steps:
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-python3
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
+  depends_on:
+  - compile-mkldnn
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    MXNET_HOME: /drone/src/unix-cpu-mkldnn
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-mkldnn-scala
+- commands:
+  - cd $${FLAVOR_BUILD_DIR}
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_minimal_R
+  depends_on:
+  - compile-mkldnn
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    MXNET_HOME: /drone/src/unix-cpu-mkldnn
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/libmxnet.so
+  image: mxnetci/build.ubuntu_cpu
+  name: test-mkldnn-r
 - commands:
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
@@ -330,16 +484,54 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
+  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
+  - ls -liaF
+  - . ./drone-build.env
+  - set
+  - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - /work/runtime_functions.sh build_static_scala_cpu
+  - ccache -s
+  depends_on:
+  - clone-src
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-static-scala
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-scala
+    MXNET_HOME: /drone/src/unix-cpu-static-scala
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-static-scala/libmxnet.so
+  image: mxnetci/publish.ubuntu1404_cpu
+  name: compile-static-scala
+- commands:
+  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
+  - ls -liaF
+  - . ./drone-build.env
+  - set
+  - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - /work/runtime_functions.sh build_static_python_cpu
+  - ccache -s
+  depends_on:
+  - clone-src
+  environment:
+    CCACHE_DIR: /drone/src/ccache
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-static-python
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python
+    MXNET_HOME: /drone/src/unix-cpu-static-python
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-static-python/libmxnet.so
+  image: mxnetci/publish.ubuntu1404_cpu
+  name: compile-static-python
+- commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete
     --no-progress --quiet
   depends_on:
-  - compile-openblas
-  - compile-openblas-debug
-  - compile-mkl
   - compile-mkldnn
   - compile-mkldnn-mkl
   - compile-openblas-no-tvm-op
+  - compile-openblas
+  - compile-openblas-debug
+  - compile-mkl
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -349,6 +541,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: ffe77c3b1f0ba9635042e2a357522a03ee0b675b99abc09814af5a4f6b52df3c
+hmac: 8ac196be3c9c825033a342218f9f93b460fd22cb2b52c924b7fb32dc5d83e329
 
 ...
