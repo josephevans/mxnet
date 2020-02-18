@@ -58,8 +58,9 @@ steps:
     --no-progress --quiet
   depends_on:
   - compile-basic
+  detach: true
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: cleanup
+  name: build-cleanup
 type: docker
 ---
 clone:
@@ -305,11 +306,12 @@ steps:
   - compile-mkldnn-mkl
   - compile-int64
   - compile-openblas-no-tvm-op
+  detach: true
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: cleanup
+  name: build-cleanup
 type: docker
 ---
 kind: signature
-hmac: 5f2cc7beff526512d04e077c530c76aa51447a9facc7c709c71736690504c8d7
+hmac: af9339cb0669b44dc9600a31c83a746d78a9eda40ef45275614241b29686bc82
 
 ...
