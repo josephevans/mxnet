@@ -36,7 +36,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/sanity-basic
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
     MXNET_HOME: /drone/src/sanity-basic
@@ -51,7 +51,7 @@ steps:
   depends_on:
   - compile-basic
   environment:
-    CCACHE_DIR: /drone/src/ccache/sanity-basic
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
     MXNET_HOME: /drone/src/sanity-basic
@@ -111,7 +111,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/unix-cpu-openblas
@@ -125,7 +125,7 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/unix-cpu-openblas
@@ -146,7 +146,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
     MXNET_HOME: /drone/src/unix-cpu-openblas-debug
@@ -160,7 +160,7 @@ steps:
   depends_on:
   - compile-openblas-debug
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
     MXNET_HOME: /drone/src/unix-cpu-openblas-debug
@@ -181,7 +181,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkl
@@ -195,7 +195,7 @@ steps:
   depends_on:
   - compile-mkl
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkl
@@ -216,7 +216,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
     MXNET_HOME: /drone/src/unix-cpu-mkldnn
@@ -230,7 +230,7 @@ steps:
   depends_on:
   - compile-mkldnn
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
     MXNET_HOME: /drone/src/unix-cpu-mkldnn
@@ -251,7 +251,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
@@ -265,7 +265,7 @@ steps:
   depends_on:
   - compile-mkldnn-mkl
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
@@ -286,7 +286,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-int64
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-int64
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64
     MXNET_HOME: /drone/src/unix-cpu-int64
@@ -308,7 +308,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
     MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
@@ -322,7 +322,7 @@ steps:
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
+    CCACHE_DIR: /drone/src/ccache
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
     MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
@@ -349,6 +349,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 089a0bb546a835fdc1afb9ab15e7fba70f6ea5b28d7b3c52e4329405ee089d6f
+hmac: ffe77c3b1f0ba9635042e2a357522a03ee0b675b99abc09814af5a4f6b52df3c
 
 ...
