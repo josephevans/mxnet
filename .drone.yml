@@ -38,7 +38,9 @@ steps:
   environment:
     CCACHE_DIR: /drone/src/ccache/sanity-basic
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
-    FLAVOR_BUILD_DIR: sanity-basic
+    FLAVOR_BUILD_DIR: /drone/src/sanity-basic
+    MXNET_HOME: /drone/src/sanity-basic
+    MXNET_LIBRARY_PATH: /drone/src/sanity-basic/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: compile-basic
 - commands:
@@ -49,7 +51,9 @@ steps:
   depends_on:
   - compile-basic
   environment:
-    FLAVOR_BUILD_DIR: sanity-basic
+    CCACHE_DIR: /drone/src/ccache/sanity-basic
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
+    FLAVOR_BUILD_DIR: /drone/src/sanity-basic
     MXNET_HOME: /drone/src/sanity-basic
     MXNET_LIBRARY_PATH: /drone/src/sanity-basic/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -109,7 +113,9 @@ steps:
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
-    FLAVOR_BUILD_DIR: unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas
 - commands:
@@ -119,7 +125,9 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    FLAVOR_BUILD_DIR: unix-cpu-openblas
+    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/unix-cpu-openblas
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -140,7 +148,9 @@ steps:
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
-    FLAVOR_BUILD_DIR: unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    MXNET_HOME: /drone/src/unix-cpu-openblas-debug
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas-debug
 - commands:
@@ -150,7 +160,9 @@ steps:
   depends_on:
   - compile-openblas-debug
   environment:
-    FLAVOR_BUILD_DIR: unix-cpu-openblas-debug
+    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
     MXNET_HOME: /drone/src/unix-cpu-openblas-debug
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -171,7 +183,9 @@ steps:
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
-    FLAVOR_BUILD_DIR: unix-cpu-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
+    MXNET_HOME: /drone/src/unix-cpu-mkl
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkl
 - commands:
@@ -181,7 +195,9 @@ steps:
   depends_on:
   - compile-mkl
   environment:
-    FLAVOR_BUILD_DIR: unix-cpu-mkl
+    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkl
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -202,7 +218,9 @@ steps:
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
-    FLAVOR_BUILD_DIR: unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    MXNET_HOME: /drone/src/unix-cpu-mkldnn
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkldnn
 - commands:
@@ -212,7 +230,9 @@ steps:
   depends_on:
   - compile-mkldnn
   environment:
-    FLAVOR_BUILD_DIR: unix-cpu-mkldnn
+    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
     MXNET_HOME: /drone/src/unix-cpu-mkldnn
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -233,7 +253,9 @@ steps:
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
-    FLAVOR_BUILD_DIR: unix-cpu-mkldnn-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
+    MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkldnn-mkl
 - commands:
@@ -243,7 +265,9 @@ steps:
   depends_on:
   - compile-mkldnn-mkl
   environment:
-    FLAVOR_BUILD_DIR: unix-cpu-mkldnn-mkl
+    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -264,7 +288,9 @@ steps:
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-int64
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-int64
-    FLAVOR_BUILD_DIR: unix-cpu-int64
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64
+    MXNET_HOME: /drone/src/unix-cpu-int64
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-int64/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: compile-int64
 - commands:
@@ -284,7 +310,9 @@ steps:
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
-    FLAVOR_BUILD_DIR: unix-cpu-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
+    MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas-no-tvm-op
 - commands:
@@ -294,7 +322,9 @@ steps:
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
-    FLAVOR_BUILD_DIR: unix-cpu-openblas-no-tvm-op
+    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
     MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -319,6 +349,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 45efc81ce00ad27efbcfeab39c38245fb287f60ab8088f1ab80dc8326f3951b0
+hmac: 089a0bb546a835fdc1afb9ab15e7fba70f6ea5b28d7b3c52e4329405ee089d6f
 
 ...
