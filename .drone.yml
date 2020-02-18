@@ -487,9 +487,7 @@ steps:
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
-  - mxnet_variant=cpu
-  - ./ci/publish/scala/build.sh
-  - ccache -s
+  - mxnet_variant=cpu ./ci/publish/scala/build.sh
   depends_on:
   - clone-src
   environment:
@@ -501,7 +499,6 @@ steps:
 - commands:
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mxnet_variant=cpu ./ci/publish/python/build.sh
-  - ccache -s
   depends_on:
   - clone-src
   environment:
@@ -530,6 +527,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: d97bdb9f3b9600efc6b476e78dca42beaf4c1c866c763d2a7e9c8035bda1e9dc
+hmac: 6d223766a3b2c7dc1c2669ce3f2100e01e8f739ec8c4768da079bd94841bdf2a
 
 ...
