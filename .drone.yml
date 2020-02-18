@@ -152,8 +152,9 @@ steps:
   - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
   - cd scala-package
   - mvn -B install
-  - cd ..
-  - ./contrib/clojure-package/ci-test.sh
+  - cd ../contrib/clojure-package
+  - lein test
+  - lein cloverage --codecov
   depends_on:
   - compile-openblas
   environment:
@@ -167,7 +168,13 @@ steps:
 - commands:
   - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_clojure_integration
+  - cd scala-package
+  - mvn -B install
+  - cd ../contrib/clojure-package
+  - lein install
+  - EXAMPLES_HOME=$MXNET_HOME/contrib/clojure-package/examples
+  - TEST_CASES=$(find ${EXAMPLES_HOME} -name test | awk '!/dontselect1|cnn-text-classification|gan|neural-style|pre-trained-models|profiler/')
+  - for i in $TEST_CASES; do cd $i && lein test; done
   depends_on:
   - compile-openblas
   environment:
@@ -528,12 +535,15 @@ steps:
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete
     --no-progress --quiet
   depends_on:
+  - compile-int64
   - compile-mkl
   - compile-mkldnn
   - compile-mkldnn-mkl
   - compile-openblas
   - compile-openblas-debug
   - compile-openblas-no-tvm-op
+  - compile-static-python
+  - compile-static-scala
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -543,6 +553,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 4a953bab7b508ff08caff2bab17725ad4f6d7e69baa0216c03c7bafce5de4c21
+hmac: 96a8ba72854f4e6f469c573e5efabc8f604128087cf31a62dca3e048efc4316e
 
 ...
