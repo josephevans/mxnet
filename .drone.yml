@@ -305,7 +305,8 @@ steps:
 - commands:
   - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_cpp
+  - find . -name mxnet_unit_tests
+  - build/tests/mxnet_unit_tests
   depends_on:
   - compile-openblas-debug
   environment:
@@ -507,28 +508,45 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
+  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
+  - ls -liaF
+  - . ./drone-build.env
+  - set
+  - ccache --zero-stats
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
   - mxnet_variant=cpu ./ci/publish/scala/build.sh
+  - ccache -s
   depends_on:
   - clone-src
   environment:
+    CCACHE_DIR: /drone/src/ccache/unix-cpu-static-scala
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-static-scala
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-scala
     MXNET_HOME: /drone/src/unix-cpu-static-scala
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-static-scala/libmxnet.so
-  image: mxnetci/publish.ubuntu1404_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile-static-scala
 - commands:
+  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
+  - ls -liaF
+  - . ./drone-build.env
+  - set
+  - ccache --zero-stats
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
-  - mxnet_variant=cpu ./ci/publish/python/build.sh
+  - mxnet_variant=cpu tools/staticbuild/build.sh
+  - tools/staticbuild/build_wheel.sh
+  - ccache -s
   depends_on:
   - clone-src
   environment:
+    CCACHE_DIR: /drone/src/ccache/unix-cpu-static-python
+    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-static-python
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python
     MXNET_HOME: /drone/src/unix-cpu-static-python
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-static-python/libmxnet.so
-  image: mxnetci/publish.ubuntu1404_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile-static-python
 - commands:
   - ls -liaF && du -hs *
@@ -553,6 +571,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 96a8ba72854f4e6f469c573e5efabc8f604128087cf31a62dca3e048efc4316e
+hmac: 372a2569eca764deffab6d2dc396e241b1c331b975fed31ea4d290351e6d3697
 
 ...
