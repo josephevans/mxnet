@@ -28,7 +28,7 @@ steps:
   - . ./drone-build.env
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 16
   - make cython PYTHON=python3
@@ -36,20 +36,20 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: sanity-basic
     CCACHE_DIR: /drone/src/ccache/sanity-basic
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
+    FLAVOR_BUILD_DIR: sanity-basic
   image: mxnetci/build.ubuntu_cpu
   name: compile-basic
 - commands:
-  - cd $${BUILD_DIR}
+  - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd python && pip install -e . && cd ..
   - MXNET_TEST_COUNT=1 nosetests --nocapture --verbose tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - compile-basic
   environment:
-    BUILD_DIR: sanity-basic
+    FLAVOR_BUILD_DIR: sanity-basic
     MXNET_HOME: /drone/src/sanity-basic
     MXNET_LIBRARY_PATH: /drone/src/sanity-basic/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -99,7 +99,7 @@ steps:
   - . ./drone-build.env
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
@@ -107,19 +107,19 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: unix-cpu-openblas
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: unix-cpu-openblas
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas
 - commands:
-  - cd $${BUILD_DIR}
+  - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas
   environment:
-    BUILD_DIR: unix-cpu-openblas
+    FLAVOR_BUILD_DIR: unix-cpu-openblas
     MXNET_HOME: /drone/src/unix-cpu-openblas
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -130,7 +130,7 @@ steps:
   - . ./drone-build.env
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
@@ -138,19 +138,19 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: unix-cpu-openblas-debug
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: unix-cpu-openblas-debug
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas-debug
 - commands:
-  - cd $${BUILD_DIR}
+  - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas-debug
   environment:
-    BUILD_DIR: unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: unix-cpu-openblas-debug
     MXNET_HOME: /drone/src/unix-cpu-openblas-debug
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -161,7 +161,7 @@ steps:
   - . ./drone-build.env
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
@@ -169,19 +169,19 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: unix-cpu-mkl
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
+    FLAVOR_BUILD_DIR: unix-cpu-mkl
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkl
 - commands:
-  - cd $${BUILD_DIR}
+  - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-mkl
   environment:
-    BUILD_DIR: unix-cpu-mkl
+    FLAVOR_BUILD_DIR: unix-cpu-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkl
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -192,7 +192,7 @@ steps:
   - . ./drone-build.env
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j4
   - make cython PYTHON=python3
@@ -200,19 +200,19 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: unix-cpu-mkldnn
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: unix-cpu-mkldnn
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkldnn
 - commands:
-  - cd $${BUILD_DIR}
+  - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile-mkldnn
   environment:
-    BUILD_DIR: unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: unix-cpu-mkldnn
     MXNET_HOME: /drone/src/unix-cpu-mkldnn
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -223,7 +223,7 @@ steps:
   - . ./drone-build.env
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
     -j4
   - make cython PYTHON=python3
@@ -231,19 +231,19 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: unix-cpu-mkldnn-mkl
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
+    FLAVOR_BUILD_DIR: unix-cpu-mkldnn-mkl
   image: mxnetci/build.ubuntu_cpu
   name: compile-mkldnn-mkl
 - commands:
-  - cd $${BUILD_DIR}
+  - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile-mkldnn-mkl
   environment:
-    BUILD_DIR: unix-cpu-mkldnn-mkl
+    FLAVOR_BUILD_DIR: unix-cpu-mkldnn-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -254,7 +254,7 @@ steps:
   - . ./drone-build.env
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja
   - ninja -v -j 4
@@ -262,9 +262,9 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: unix-cpu-int64
     CCACHE_DIR: /drone/src/ccache/unix-cpu-int64
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-int64
+    FLAVOR_BUILD_DIR: unix-cpu-int64
   image: mxnetci/build.ubuntu_cpu
   name: compile-int64
 - commands:
@@ -273,7 +273,7 @@ steps:
   - . ./drone-build.env
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${BUILD_DIR} && cd $${BUILD_DIR}
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja
@@ -282,19 +282,19 @@ steps:
   depends_on:
   - clone-src
   environment:
-    BUILD_DIR: unix-cpu-openblas-no-tvm-op
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: unix-cpu-openblas-no-tvm-op
   image: mxnetci/build.ubuntu_cpu
   name: compile-openblas-no-tvm-op
 - commands:
-  - cd $${BUILD_DIR}
+  - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
-    BUILD_DIR: unix-cpu-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: unix-cpu-openblas-no-tvm-op
     MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
     MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
@@ -319,6 +319,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 05bcd2d6035bfe187046ce8495a592c8fedac50ac99f939ec382a33f3630a5a1
+hmac: 45efc81ce00ad27efbcfeab39c38245fb287f60ab8088f1ab80dc8326f3951b0
 
 ...
