@@ -23,12 +23,12 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
   - set
   - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 16
   - make cython PYTHON=python3
@@ -98,12 +98,12 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
   - set
   - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
@@ -245,12 +245,12 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-onnx
 - commands:
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
   - set
   - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
@@ -294,12 +294,12 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-debug-cpp
 - commands:
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
   - set
   - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
@@ -329,12 +329,12 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-mkl-python3
 - commands:
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
   - set
   - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j4
   - make cython PYTHON=python3
@@ -392,12 +392,12 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-r
 - commands:
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
   - set
   - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
     -j4
   - make cython PYTHON=python3
@@ -427,12 +427,12 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-mkl-python3
 - commands:
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
   - set
   - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja
   - ninja -v -j 4
@@ -448,12 +448,12 @@ steps:
   image: mxnetci/build.ubuntu_cpu
   name: compile-int64
 - commands:
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
   - ls -liaF
   - . ./drone-build.env
   - set
   - ccache --zero-stats
+  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja
@@ -515,12 +515,12 @@ steps:
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete
     --no-progress --quiet
   depends_on:
-  - compile-mkldnn
-  - compile-mkl
-  - compile-openblas-debug
-  - compile-openblas-no-tvm-op
   - compile-mkldnn-mkl
+  - compile-openblas-no-tvm-op
+  - compile-openblas-debug
+  - compile-mkldnn
   - compile-openblas
+  - compile-mkl
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -530,6 +530,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 362468e5ec54406608e5c55189e50d879cff390a1e99f01e5fccfbc89a275c5a
+hmac: f1ea097d652dced5f0456fe9042b4f95383e61275551cfd70677d0d9fef1e8a5
 
 ...
