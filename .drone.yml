@@ -43,15 +43,15 @@ steps:
   name: compile-basic
 - commands:
   - cd $${BUILD_DIR}
-  - find . -name libmxnet.so
+  - pwd && ls -liaF && find . -name libmxnet.so
   - cd python && pip install -e . && cd ..
   - MXNET_TEST_COUNT=1 nosetests --nocapture --verbose tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - compile-basic
   environment:
     BUILD_DIR: sanity-basic
-    MXNET_HOME: sanity-basic
-    MXNET_LIBRARY_PATH: /drone/src/sanity-basic/python/mxnet/libmxnet.so
+    MXNET_HOME: /drone/src/sanity-basic
+    MXNET_LIBRARY_PATH: /drone/src/sanity-basic/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-basic-python
 - commands:
@@ -114,14 +114,14 @@ steps:
   name: compile-openblas
 - commands:
   - cd $${BUILD_DIR}
-  - find . -name libmxnet.so
+  - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas
   environment:
     BUILD_DIR: unix-cpu-openblas
-    MXNET_HOME: unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/python/mxnet/libmxnet.so
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-python3
 - commands:
@@ -145,14 +145,14 @@ steps:
   name: compile-openblas-debug
 - commands:
   - cd $${BUILD_DIR}
-  - find . -name libmxnet.so
+  - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas-debug
   environment:
     BUILD_DIR: unix-cpu-openblas-debug
-    MXNET_HOME: unix-cpu-openblas-debug
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/python/mxnet/libmxnet.so
+    MXNET_HOME: /drone/src/unix-cpu-openblas-debug
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-debug-python3
 - commands:
@@ -176,14 +176,14 @@ steps:
   name: compile-mkl
 - commands:
   - cd $${BUILD_DIR}
-  - find . -name libmxnet.so
+  - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-mkl
   environment:
     BUILD_DIR: unix-cpu-mkl
-    MXNET_HOME: unix-cpu-mkl
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/python/mxnet/libmxnet.so
+    MXNET_HOME: /drone/src/unix-cpu-mkl
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-mkl-python3
 - commands:
@@ -207,14 +207,14 @@ steps:
   name: compile-mkldnn
 - commands:
   - cd $${BUILD_DIR}
-  - find . -name libmxnet.so
+  - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile-mkldnn
   environment:
     BUILD_DIR: unix-cpu-mkldnn
-    MXNET_HOME: unix-cpu-mkldnn
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/python/mxnet/libmxnet.so
+    MXNET_HOME: /drone/src/unix-cpu-mkldnn
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-python3
 - commands:
@@ -238,14 +238,14 @@ steps:
   name: compile-mkldnn-mkl
 - commands:
   - cd $${BUILD_DIR}
-  - find . -name libmxnet.so
+  - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile-mkldnn-mkl
   environment:
     BUILD_DIR: unix-cpu-mkldnn-mkl
-    MXNET_HOME: unix-cpu-mkldnn-mkl
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/python/mxnet/libmxnet.so
+    MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-mkl-python3
 - commands:
@@ -289,14 +289,14 @@ steps:
   name: compile-openblas-no-tvm-op
 - commands:
   - cd $${BUILD_DIR}
-  - find . -name libmxnet.so
+  - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
     BUILD_DIR: unix-cpu-openblas-no-tvm-op
-    MXNET_HOME: unix-cpu-openblas-no-tvm-op
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/python/mxnet/libmxnet.so
+    MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/libmxnet.so
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
@@ -319,6 +319,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 07e1042d361617c4f918888b5c12caf800edc749013eb93635739a79910831a4
+hmac: 05bcd2d6035bfe187046ce8495a592c8fedac50ac99f939ec382a33f3630a5a1
 
 ...
