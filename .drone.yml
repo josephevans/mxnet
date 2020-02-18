@@ -135,7 +135,11 @@ steps:
 - commands:
   - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
+  - scala-package/core/scripts/get_cifar_data.sh
+  - export DMLC_LOG_STACK_TRACE_DEPTH=10
+  - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+  - cd scala-package
+  - mvn -B verify -DskipTests=false
   depends_on:
   - compile-openblas
   environment:
@@ -306,6 +310,9 @@ steps:
   - cd $${FLAVOR_BUILD_DIR}
   - pwd && ls -liaF && find . -name libmxnet.so
   - find . -name mxnet_unit_tests
+  - ls -liaF build/tests/mxnet_unit_tests
+  - file build/tests/mxnet_unit_tests
+  - ldd build/tests/mxnet_unit_tests
   - build/tests/mxnet_unit_tests
   depends_on:
   - compile-openblas-debug
@@ -535,7 +542,7 @@ steps:
   - set
   - ccache --zero-stats
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
-  - mxnet_variant=cpu tools/staticbuild/build.sh
+  - tools/staticbuild/build.sh cpu
   - tools/staticbuild/build_wheel.sh
   - ccache -s
   depends_on:
@@ -571,6 +578,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 372a2569eca764deffab6d2dc396e241b1c331b975fed31ea4d290351e6d3697
+hmac: cbe3c04fa9d600ef3212b25366154d5b85f76fd01c26a41aa62a21b2d0d4f0d7
 
 ...
