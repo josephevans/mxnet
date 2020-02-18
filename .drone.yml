@@ -56,7 +56,7 @@ steps:
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/sanity-ccache --delete
     --no-progress --quiet
   depends_on:
-  - test-basic-python
+  - compile-basic
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: cleanup
 type: docker
@@ -290,18 +290,18 @@ steps:
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete
     --no-progress --quiet
   depends_on:
-  - test-openblas-python3
-  - test-openblas-debug-python3
-  - test-mkl-python3
-  - test-mkldnn-python3
-  - test-mkldnn-mkl-python3
-  - test-int64-python3
-  - test-openblas-no-tvm-op-python3
+  - compile-openblas
+  - compile-openblas-debug
+  - compile-mkl
+  - compile-mkldnn
+  - compile-mkldnn-mkl
+  - compile-int64
+  - compile-openblas-no-tvm-op
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: cleanup
 type: docker
 ---
 kind: signature
-hmac: 880633c0a57110bcc77414d3ea133c6c0e44a773f6b82535452799d76d758949
+hmac: c028b5bd581a95e48d14240f311118e4365495fd58a705250efe13943fe6c524
 
 ...
