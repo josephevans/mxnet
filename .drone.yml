@@ -282,8 +282,7 @@ steps:
   - ccache --zero-stats
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
-  - make build/tests/cpp/mxnet_unit_tests
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4 test
   - make cython PYTHON=python3
   - ccache -s
   - find . -name libmxnet.so
@@ -494,9 +493,10 @@ steps:
   - set
   - ccache --zero-stats
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
-    -G Ninja
+    -G Ninja ..
   - ninja -v -j 4
   - ccache -s
   - find . -name libmxnet.so
@@ -590,6 +590,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: b3e3bf741089e7a6e0ebc12b0f821bf7c8d5fa2ae57518ea07bb9e87c0a56039
+hmac: 3ae644686f64007494b5f8665556db313abe7338808492ebec668f86f35580e0
 
 ...
