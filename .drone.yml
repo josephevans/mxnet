@@ -52,7 +52,7 @@ steps:
   - cd $TEST_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd python && pip install -e . && cd ..
-  - MXNET_TEST_COUNT=1 nosetests --nocapture --verbose tests/python/unittest/test_operator.py:test_norm
+  - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - compile-basic
   environment:
@@ -130,7 +130,20 @@ steps:
   - /ci/copy_libs.sh $FLAVOR_BUILD_DIR $TEST_BUILD_DIR
   - cd $TEST_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - PYTHONPATH=./python/
+  - MXNET_MKLDNN_DEBUG=0
+  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - MXNET_SUBGRAPH_VERBOSE=0
+  - MXNET_ENABLE_CYTHON=0
+  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
+    --cover-package=mxnet"
+  - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
+    warning,error"
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas
   environment:
@@ -170,7 +183,7 @@ steps:
   - lein test
   - lein cloverage --codecov
   depends_on:
-  - test-openblas-scala
+  - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/tests/unix-cpu-openblas-clojure
@@ -191,7 +204,7 @@ steps:
   - TEST_CASES=$(find ${EXAMPLES_HOME} -name test | awk '!/dontselect1|cnn-text-classification|gan|neural-style|pre-trained-models|profiler/')
   - for i in $TEST_CASES; do cd $i && lein test && cd ..; done
   depends_on:
-  - test-openblas-clojure
+  - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/tests/unix-cpu-openblas-clojure-integration
@@ -299,7 +312,7 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
     -G Ninja ..
-  - ninja -v -j 4
+  - ninja -j 4
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -319,7 +332,20 @@ steps:
   - /ci/copy_libs.sh $FLAVOR_BUILD_DIR $TEST_BUILD_DIR
   - cd $TEST_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - PYTHONPATH=./python/
+  - MXNET_MKLDNN_DEBUG=0
+  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - MXNET_SUBGRAPH_VERBOSE=0
+  - MXNET_ENABLE_CYTHON=0
+  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
+    --cover-package=mxnet"
+  - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
+    warning,error"
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas-debug
   environment:
@@ -377,7 +403,20 @@ steps:
   - /ci/copy_libs.sh $FLAVOR_BUILD_DIR $TEST_BUILD_DIR
   - cd $TEST_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - PYTHONPATH=./python/
+  - MXNET_MKLDNN_DEBUG=0
+  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - MXNET_SUBGRAPH_VERBOSE=0
+  - MXNET_ENABLE_CYTHON=0
+  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
+    --cover-package=mxnet"
+  - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
+    warning,error"
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-mkl
   environment:
@@ -505,7 +544,7 @@ steps:
   - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
-  - ninja -v -j 4
+  - ninja -j 4
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -531,7 +570,7 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja ..
-  - ninja -v -j 4
+  - ninja -j 4
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -551,7 +590,20 @@ steps:
   - /ci/copy_libs.sh $FLAVOR_BUILD_DIR $TEST_BUILD_DIR
   - cd $TEST_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - PYTHONPATH=./python/
+  - MXNET_MKLDNN_DEBUG=0
+  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - MXNET_SUBGRAPH_VERBOSE=0
+  - MXNET_ENABLE_CYTHON=0
+  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
+    --cover-package=mxnet"
+  - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
+    warning,error"
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
@@ -631,6 +683,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: ca85f6f8ea74bab8097e85ed3111600ec779a49ebe17e2dc30aa67c419325ad8
+hmac: 1600fc1a0d8232caa62c5a52d3e67532ecaa6a31bbd67b6be67a8013afe39162
 
 ...
