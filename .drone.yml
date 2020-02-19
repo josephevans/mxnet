@@ -590,12 +590,12 @@ steps:
   - /ci/copy_libs.sh $FLAVOR_BUILD_DIR $TEST_BUILD_DIR
   - cd $TEST_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - PYTHONPATH=./python/
-  - MXNET_MKLDNN_DEBUG=0
-  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - MXNET_SUBGRAPH_VERBOSE=0
-  - MXNET_ENABLE_CYTHON=0
-  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - export PYTHONPATH=./python/
+  - export MXNET_MKLDNN_DEBUG=0
+  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - export MXNET_SUBGRAPH_VERBOSE=0
+  - export MXNET_ENABLE_CYTHON=0
+  - export DMLC_LOG_STACK_TRACE_DEPTH=10
   - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
     --cover-package=mxnet"
   - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
@@ -683,6 +683,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 43418935f511abe36449e20b268634f0fa07832de76806b528e4540e58528845
+hmac: 2c556e1e3d03d2505024a61fbc46c560e186e67236c88be94f3bac05211574ad
 
 ...
