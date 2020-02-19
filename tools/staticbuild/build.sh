@@ -30,13 +30,15 @@ if [[ $VARIANT == darwin* ]]; then
     export VARIANT="darwin"
 fi
 
-NUM_PROC=1
-if [[ ! -z $(command -v nproc) ]]; then
+if [[ ! -z "$NUM_PROC" ]]; then
+    echo "Using $NUM_PROC build jobs."
+elif [[ ! -z $(command -v nproc) ]]; then
     NUM_PROC=$(nproc)
 elif [[ ! -z $(command -v sysctl) ]]; then
     NUM_PROC=$(sysctl -n hw.ncpu)
 else
     >&2 echo "Can't discover number of cores."
+    NUM_PROC=1
 fi
 export NUM_PROC
 >&2 echo "Using $NUM_PROC parallel jobs in building."
