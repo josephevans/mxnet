@@ -178,7 +178,7 @@ steps:
   - lein install
   - EXAMPLES_HOME=$MXNET_HOME/contrib/clojure-package/examples
   - TEST_CASES=$(find ${EXAMPLES_HOME} -name test | awk '!/dontselect1|cnn-text-classification|gan|neural-style|pre-trained-models|profiler/')
-  - for i in $TEST_CASES; do cd $i && lein test; done
+  - for i in $TEST_CASES; do cd $i && lein test && cd ..; done
   depends_on:
   - compile-openblas
   environment:
@@ -280,6 +280,7 @@ steps:
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
+  - make build/tests/cpp/mxnet_unit_tests
   - make cython PYTHON=python3
   - ccache -s
   depends_on:
@@ -578,6 +579,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 9e7d20b3e27a97f6cb5d659de0886f7e54087213ae6f1ad11bc7021aa7db2df4
+hmac: de3ae6533d114c58edfafefa7372092c2f5be699239ce23140ea1ef9e4b6f948
 
 ...
