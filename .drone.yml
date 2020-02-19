@@ -30,7 +30,7 @@ steps:
   - ccache --zero-stats
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 16
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 64
   - make cython PYTHON=python3
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -218,6 +218,7 @@ steps:
   - julia --project=./julia -e 'using Pkg; Pkg.build("MXNet")'
   - julia --project=./julia -e 'using Pkg; Pkg.test("MXNet")'
   - julia --project=./julia -e 'using MXNet; mx._sig_checker()'
+  - ls -liaF /work && ls -liaF /work/julia07
   depends_on:
   - compile-openblas
   environment:
@@ -236,6 +237,7 @@ steps:
   - julia --project=./julia -e 'using Pkg; Pkg.build("MXNet")'
   - julia --project=./julia -e 'using Pkg; Pkg.test("MXNet")'
   - julia --project=./julia -e 'using MXNet; mx._sig_checker()'
+  - ls -liaF /work && ls -liaF /work/julia10
   depends_on:
   - compile-openblas
   environment:
@@ -575,6 +577,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: b916b3e54da152926f27dedc554c930dd90d8d2a51f207e702749efb3495c25a
+hmac: 4804cb7a0debed50403a411b3d2922575a34e679fa68fd4a3d6671ea0dbf7a1a
 
 ...
