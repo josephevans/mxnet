@@ -17,7 +17,7 @@ steps:
   - git submodule update --init --recursive
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache /drone/src/ccache --no-progress
-    --quiet
+    --quiet || true
   - /ci/setup_build_env.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -39,7 +39,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/sanity-basic
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
     MXNET_HOME: /drone/src/sanity-basic
@@ -65,7 +65,7 @@ steps:
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/sanity-ccache --delete
-    --no-progress --quiet
+    --no-progress --quiet || true
   depends_on:
   - compile-basic
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -96,7 +96,7 @@ steps:
   - git submodule update --init --recursive
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache /drone/src/ccache --no-progress
-    --quiet
+    --quiet || true
   - /ci/setup_build_env.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -118,7 +118,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/unix-cpu-openblas
@@ -320,7 +320,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
     MXNET_HOME: /drone/src/unix-cpu-openblas-debug
@@ -391,7 +391,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkl
@@ -443,7 +443,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
     MXNET_HOME: /drone/src/unix-cpu-mkldnn
@@ -512,7 +512,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
     MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
@@ -552,7 +552,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-int64
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-int64
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64
     MXNET_HOME: /drone/src/unix-cpu-int64
@@ -578,7 +578,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
     MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
@@ -630,7 +630,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-static-scala
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-static-scala
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-scala
     MXNET_HOME: /drone/src/unix-cpu-static-scala
@@ -653,7 +653,7 @@ steps:
   - clone-src
   environment:
     CCACHE_DIR: /drone/src/ccache/unix-cpu-static-python
-    CCACHE_MAXSIZE: 10G
+    CCACHE_MAXSIZE: 2G
     CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-static-python
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python
     MXNET_HOME: /drone/src/unix-cpu-static-python
@@ -663,7 +663,7 @@ steps:
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete
-    --no-progress --quiet
+    --no-progress --quiet || true
   depends_on:
   - compile-int64
   - compile-mkl
@@ -683,6 +683,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 1600fc1a0d8232caa62c5a52d3e67532ecaa6a31bbd67b6be67a8013afe39162
+hmac: 43418935f511abe36449e20b268634f0fa07832de76806b528e4540e58528845
 
 ...
