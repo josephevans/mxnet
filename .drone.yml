@@ -17,7 +17,7 @@ steps:
   - git submodule update --init --recursive
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache /drone/src/ccache --no-progress
-    --quiet || true
+    --size-only --quiet || true
   - /ci/setup_build_env.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -31,7 +31,6 @@ steps:
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 64
-  - make cython PYTHON=python3
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -62,7 +61,7 @@ steps:
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/sanity-ccache --delete
-    --no-progress --quiet || true
+    --no-progress --size-only --quiet || true
   depends_on:
   - compile-basic
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -93,7 +92,7 @@ steps:
   - git submodule update --init --recursive
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache /drone/src/ccache --no-progress
-    --quiet || true
+    --size-only --quiet || true
   - /ci/setup_build_env.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -107,7 +106,6 @@ steps:
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
-  - make cython PYTHON=python3
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -125,12 +123,12 @@ steps:
 - commands:
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - PYTHONPATH=./python/
-  - MXNET_MKLDNN_DEBUG=0
-  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - MXNET_SUBGRAPH_VERBOSE=0
-  - MXNET_ENABLE_CYTHON=0
-  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - export PYTHONPATH=./python/
+  - export MXNET_MKLDNN_DEBUG=0
+  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - export MXNET_SUBGRAPH_VERBOSE=0
+  - export MXNET_ENABLE_CYTHON=0
+  - export DMLC_LOG_STACK_TRACE_DEPTH=10
   - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
     --cover-package=mxnet"
   - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
@@ -300,12 +298,12 @@ steps:
 - commands:
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - PYTHONPATH=./python/
-  - MXNET_MKLDNN_DEBUG=0
-  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - MXNET_SUBGRAPH_VERBOSE=0
-  - MXNET_ENABLE_CYTHON=0
-  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - export PYTHONPATH=./python/
+  - export MXNET_MKLDNN_DEBUG=0
+  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - export MXNET_SUBGRAPH_VERBOSE=0
+  - export MXNET_ENABLE_CYTHON=0
+  - export DMLC_LOG_STACK_TRACE_DEPTH=10
   - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
     --cover-package=mxnet"
   - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
@@ -347,7 +345,6 @@ steps:
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
-  - make cython PYTHON=python3
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -365,12 +362,12 @@ steps:
 - commands:
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - PYTHONPATH=./python/
-  - MXNET_MKLDNN_DEBUG=0
-  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - MXNET_SUBGRAPH_VERBOSE=0
-  - MXNET_ENABLE_CYTHON=0
-  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - export PYTHONPATH=./python/
+  - export MXNET_MKLDNN_DEBUG=0
+  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - export MXNET_SUBGRAPH_VERBOSE=0
+  - export MXNET_ENABLE_CYTHON=0
+  - export DMLC_LOG_STACK_TRACE_DEPTH=10
   - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
     --cover-package=mxnet"
   - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
@@ -396,7 +393,6 @@ steps:
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j4
-  - make cython PYTHON=python3
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -456,7 +452,6 @@ steps:
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
     -j4
-  - make cython PYTHON=python3
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -537,12 +532,12 @@ steps:
 - commands:
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - PYTHONPATH=./python/
-  - MXNET_MKLDNN_DEBUG=0
-  - MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - MXNET_SUBGRAPH_VERBOSE=0
-  - MXNET_ENABLE_CYTHON=0
-  - DMLC_LOG_STACK_TRACE_DEPTH=10
+  - export PYTHONPATH=./python/
+  - export MXNET_MKLDNN_DEBUG=0
+  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
+  - export MXNET_SUBGRAPH_VERBOSE=0
+  - export MXNET_ENABLE_CYTHON=0
+  - export DMLC_LOG_STACK_TRACE_DEPTH=10
   - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
     --cover-package=mxnet"
   - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
@@ -609,7 +604,7 @@ steps:
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete
-    --no-progress --quiet || true
+    --no-progress --size-only --quiet || true
   depends_on:
   - compile-int64
   - compile-mkl
@@ -629,6 +624,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 9754bf93b779d54602f2bf38c5342a5eea237c8712632dd1c409e864de125378
+hmac: 83a4996080e182f2de844bee1d40fd28d724e6a729275b3cd7f8755e35a477c4
 
 ...
