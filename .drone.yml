@@ -55,12 +55,10 @@ steps:
   depends_on:
   - compile-basic
   environment:
-    CCACHE_DIR: /drone/src/ccache/sanity-basic
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
-    MXNET_HOME: /drone/src/sanity-basic
-    MXNET_LIBRARY_PATH: /drone/src/sanity-basic/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/sanity-basic-python
+    MXNET_LIBRARY_PATH: /drone/src/tests/sanity-basic-python/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/sanity-basic-python
   image: mxnetci/build.ubuntu_cpu
   name: test-basic-python
 - commands:
@@ -134,12 +132,10 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-python3
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-python3/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-python3
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-python3
 - commands:
@@ -153,12 +149,10 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-scala
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-scala/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-scala
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-scala
 - commands:
@@ -172,14 +166,12 @@ steps:
   - lein test
   - lein cloverage --codecov
   depends_on:
-  - compile-openblas
+  - test-openblas-scala
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-clojure
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-clojure/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-clojure
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-clojure
 - commands:
@@ -194,14 +186,12 @@ steps:
   - TEST_CASES=$(find ${EXAMPLES_HOME} -name test | awk '!/dontselect1|cnn-text-classification|gan|neural-style|pre-trained-models|profiler/')
   - for i in $TEST_CASES; do cd $i && lein test && cd ..; done
   depends_on:
-  - compile-openblas
+  - test-openblas-clojure
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-clojure-integration
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-clojure-integration/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-clojure-integration
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-clojure-integration
 - commands:
@@ -212,12 +202,10 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-perl
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-perl/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-perl
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-perl
 - commands:
@@ -228,12 +216,10 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-r
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-r/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-r
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-r
 - commands:
@@ -250,12 +236,10 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-julia-0.7
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-julia-0.7/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-julia-0.7
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-julia-0.7
 - commands:
@@ -272,12 +256,10 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-julia-1.0
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-julia-1.0/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-julia-1.0
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-julia-1.0
 - commands:
@@ -288,12 +270,10 @@ steps:
   depends_on:
   - compile-openblas
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-onnx
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-onnx/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-onnx
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-onnx
 - commands:
@@ -330,12 +310,10 @@ steps:
   depends_on:
   - compile-openblas-debug
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
-    MXNET_HOME: /drone/src/unix-cpu-openblas-debug
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-debug-python3
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-debug-python3/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-debug-python3
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-debug-python3
 - commands:
@@ -350,12 +328,10 @@ steps:
   depends_on:
   - compile-openblas-debug
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
-    MXNET_HOME: /drone/src/unix-cpu-openblas-debug
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-debug-cpp
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-debug-cpp/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-debug-cpp
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-debug-cpp
 - commands:
@@ -390,12 +366,10 @@ steps:
   depends_on:
   - compile-mkl
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
-    MXNET_HOME: /drone/src/unix-cpu-mkl
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-mkl-python3
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-mkl-python3/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-mkl-python3
   image: mxnetci/build.ubuntu_cpu
   name: test-mkl-python3
 - commands:
@@ -430,12 +404,10 @@ steps:
   depends_on:
   - compile-mkldnn
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-mkldnn-python3
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-mkldnn-python3/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-mkldnn-python3
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-python3
 - commands:
@@ -446,12 +418,10 @@ steps:
   depends_on:
   - compile-mkldnn
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-mkldnn-scala
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-mkldnn-scala/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-mkldnn-scala
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-scala
 - commands:
@@ -462,12 +432,10 @@ steps:
   depends_on:
   - compile-mkldnn
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-mkldnn-r
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-mkldnn-r/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-mkldnn-r
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-r
 - commands:
@@ -502,12 +470,10 @@ steps:
   depends_on:
   - compile-mkldnn-mkl
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-mkldnn-mkl-python3
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-mkldnn-mkl-python3/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-mkldnn-mkl-python3
   image: mxnetci/build.ubuntu_cpu
   name: test-mkldnn-mkl-python3
 - commands:
@@ -569,12 +535,10 @@ steps:
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
-    CCACHE_MAXSIZE: 10G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
-    MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/lib/libmxnet.so
+    MXNET_HOME: /drone/src/tests/unix-cpu-openblas-no-tvm-op-python3
+    MXNET_LIBRARY_PATH: /drone/src/tests/unix-cpu-openblas-no-tvm-op-python3/lib/libmxnet.so
+    TEST_BUILD_DIR: /drone/src/tests/unix-cpu-openblas-no-tvm-op-python3
   image: mxnetci/build.ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
@@ -647,6 +611,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: f03d4e603654d65330900d7d2537d96ccf8b4ace90b2ec3efb7919131d52dbea
+hmac: 091b0407370279a193a4baeecf28850c350741bf85f3ca8eec8a16297d9b3c4e
 
 ...
