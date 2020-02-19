@@ -33,7 +33,8 @@ steps:
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 16
   - make cython PYTHON=python3
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -108,8 +109,10 @@ steps:
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
+  - mkdir -p scala-package/lib && ln lib/libmxnet.so scala-package/lib/libmxnet.so
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -287,7 +290,8 @@ steps:
     -G Ninja ..
   - ninja -v -j 4
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -341,7 +345,8 @@ steps:
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
   - make cython PYTHON=python3
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -377,7 +382,8 @@ steps:
     -j4
   - make cython PYTHON=python3
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -441,7 +447,8 @@ steps:
     -j4
   - make cython PYTHON=python3
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -473,11 +480,13 @@ steps:
   - set
   - ccache --zero-stats
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
-    -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja
+    -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
   - ninja -v -j 4
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -501,7 +510,8 @@ steps:
     -G Ninja ..
   - ninja -v -j 4
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -537,7 +547,8 @@ steps:
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
   - NUM_PROC=4 mxnet_variant=cpu ./ci/publish/scala/build.sh
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -558,7 +569,8 @@ steps:
   - NUM_PROC=4 tools/staticbuild/build.sh cpu
   - tools/staticbuild/build_wheel.sh
   - ccache -s
-  - find . -name libmxnet.so
+  - pwd && find . -name libmxnet.so
+  - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
@@ -592,6 +604,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 220961c5496362d344ab5b66238c774a36a14d8820ea93c135c15c34fe717802
+hmac: 9eccb88f8999afe670a2f6dcd6a660d50e5d924579d617a3d0436334fa5528c0
 
 ...
