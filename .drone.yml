@@ -336,6 +336,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - source /opt/intel/bin/compilervars.sh intel64
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j8
   - ccache -s
@@ -429,7 +430,8 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
+  - source /opt/intel/bin/compilervars.sh intel64
+  - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel
     -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -574,6 +576,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 8899aef88c42bdaecb8b0d0ad3f65f05f018a38b8fda0b72da50558317e9401f
+hmac: 675efed30d773c33dfc9e5276720a87b78bcb806402135b4989ef21189d6e2ab
 
 ...
