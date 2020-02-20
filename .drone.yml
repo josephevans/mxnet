@@ -136,7 +136,7 @@ steps:
   - scala-package/core/scripts/get_cifar_data.sh
   - scala-package/core/scripts/get_mnist_data.sh
   - cd scala-package
-  - mvn -B install
+  - mvn -B install -DskipTests=true
   depends_on:
   - compile-openblas
   environment:
@@ -569,6 +569,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: c54b671b835f1cc418fa021490bda90f279caa72e8b42081d51565c5c2897aa3
+hmac: 332036e180257576306fc41588e2b6d59c88e1e7cf860cab22caa10d41fcff7f
 
 ...
