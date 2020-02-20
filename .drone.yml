@@ -320,7 +320,6 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - find . -name mxnet_unit_tests
   - ls -liaF build/tests/mxnet_unit_tests
-  - file build/tests/mxnet_unit_tests
   - ldd build/tests/mxnet_unit_tests
   - build/tests/mxnet_unit_tests
   depends_on:
@@ -575,6 +574,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: fb3c4e90fd93457b34bb353158a2cc0b6cab71fc594d7b6f2b0c47c7a6505625
+hmac: 8899aef88c42bdaecb8b0d0ad3f65f05f018a38b8fda0b72da50558317e9401f
 
 ...
