@@ -22,13 +22,12 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 64
@@ -38,23 +37,21 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/sanity-basic
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/sanity-basic
+    FLAVOR: basic
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
-    MXNET_HOME: /drone/src/sanity-basic
-    MXNET_LIBRARY_PATH: /drone/src/sanity-basic/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-basic
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd python && pip install -e . && cd ..
   - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - compile-basic
   environment:
+    FLAVOR: basic
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-basic-python
@@ -97,13 +94,12 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - ccache -s
@@ -112,17 +108,14 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
     nosetests_unittest.xml tests/python/unittest
@@ -131,12 +124,14 @@ steps:
   depends_on:
   - compile-openblas
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-python3
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - scala-package/core/scripts/get_cifar_data.sh
   - scala-package/core/scripts/get_mnist_data.sh
@@ -145,24 +140,28 @@ steps:
   depends_on:
   - compile-openblas
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-scala-prep
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd scala-package
   - mvn -B verify -DskipTests=false
   depends_on:
   - test-openblas-scala-prep
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-scala
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd contrib/clojure-package
   - lein test
@@ -170,12 +169,14 @@ steps:
   depends_on:
   - test-openblas-scala-prep
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-clojure
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd contrib/clojure-package
   - lein install
@@ -185,34 +186,40 @@ steps:
   depends_on:
   - test-openblas-scala-prep
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-clojure-integration
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
   - compile-openblas
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-perl
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpu_R
   depends_on:
   - compile-openblas
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-r
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - export PATH="/work/julia07/bin:$PATH"
   - export JULIA_DEPOT_PATH='/work/julia-depot'
@@ -225,12 +232,14 @@ steps:
   depends_on:
   - compile-openblas
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-julia-0.7
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - export PATH="/work/julia10/bin:$PATH"
   - export JULIA_DEPOT_PATH='/work/julia-depot'
@@ -243,28 +252,30 @@ steps:
   depends_on:
   - compile-openblas
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-julia-1.0
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
   depends_on:
   - compile-openblas
   environment:
+    FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-onnx
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
@@ -276,17 +287,14 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-debug
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-debug
+    FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
-    MXNET_HOME: /drone/src/unix-cpu-openblas-debug
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas-debug
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
     nosetests_unittest.xml tests/python/unittest
@@ -295,12 +303,14 @@ steps:
   depends_on:
   - compile-openblas-debug
   environment:
+    FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-debug-python3
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - find . -name mxnet_unit_tests
   - ls -liaF build/tests/mxnet_unit_tests
@@ -310,17 +320,17 @@ steps:
   depends_on:
   - compile-openblas-debug
   environment:
+    FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-debug-cpp
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
   - ccache -s
@@ -329,17 +339,14 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkl
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkl
+    FLAVOR: mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
-    MXNET_HOME: /drone/src/unix-cpu-mkl
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkl
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
     nosetests_unittest.xml tests/python/unittest
@@ -348,17 +355,17 @@ steps:
   depends_on:
   - compile-mkl
   environment:
+    FLAVOR: mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkl-python3
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j4
   - ccache -s
@@ -367,55 +374,56 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn
+    FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkldnn
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile-mkldnn
   environment:
+    FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-python3
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
   depends_on:
   - compile-mkldnn
   environment:
+    FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-scala
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_minimal_R
   depends_on:
   - compile-mkldnn
   environment:
+    FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-r
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
     -j4
   - ccache -s
@@ -424,33 +432,30 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-mkldnn-mkl
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-mkldnn-mkl
+    FLAVOR: mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkldnn-mkl
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile-mkldnn-mkl
   environment:
+    FLAVOR: mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-mkl-python3
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
@@ -461,22 +466,17 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-int64
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-int64
+    FLAVOR: int64
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64
-    MXNET_HOME: /drone/src/unix-cpu-int64
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-int64/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-int64
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
@@ -488,17 +488,14 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-openblas-no-tvm-op
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-openblas-no-tvm-op
+    FLAVOR: openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
-    MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas-no-tvm-op
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
+  - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
     nosetests_unittest.xml tests/python/unittest
@@ -507,17 +504,17 @@ steps:
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
+    FLAVOR: openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
   - NUM_PROC=4 mxnet_variant=cpu ./ci/publish/scala/build.sh
   - ccache -s
@@ -526,22 +523,17 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-static-scala
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-static-scala
+    FLAVOR: static-scala
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-scala
-    MXNET_HOME: /drone/src/unix-cpu-static-scala
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-static-scala/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile-static-scala
 - commands:
-  - mkdir -p $${CCACHE_TEMPDIR} $${CCACHE_DIR}
-  - ls -liaF
   - . /ci/setup_build_env.sh
-  - set
-  - ccache --zero-stats
   - cp -r src.orig $FLAVOR_BUILD_DIR
   - cd $FLAVOR_BUILD_DIR
+  - ls -liaF
+  - set
+  - ccache --zero-stats
   - NUM_PROC=4 tools/staticbuild/build.sh cpu
   - tools/staticbuild/build_wheel.sh
   - ccache -s
@@ -550,12 +542,8 @@ steps:
   depends_on:
   - clone-src
   environment:
-    CCACHE_DIR: /drone/src/ccache/unix-cpu-static-python
-    CCACHE_MAXSIZE: 5G
-    CCACHE_TEMPDIR: /drone/src/ccache-tmp/unix-cpu-static-python
+    FLAVOR: static-python
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python
-    MXNET_HOME: /drone/src/unix-cpu-static-python
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-static-python/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile-static-python
 - commands:
@@ -581,6 +569,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 382bc1847cd535b39c1e60a6382d3054b11a446284731814185df54911cc6085
+hmac: c54b671b835f1cc418fa021490bda90f279caa72e8b42081d51565c5c2897aa3
 
 ...
