@@ -27,7 +27,9 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
+  - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 64
   - ccache -s
@@ -100,7 +102,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
   - ccache -s
@@ -260,7 +263,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
@@ -315,7 +319,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
   - ccache -s
@@ -352,7 +357,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j4
   - ccache -s
@@ -408,7 +414,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
     -j4
   - ccache -s
@@ -442,7 +449,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
@@ -467,7 +475,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
@@ -507,7 +516,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
   - NUM_PROC=4 mxnet_variant=cpu ./ci/publish/scala/build.sh
   - ccache -s
@@ -530,7 +540,8 @@ steps:
   - . /ci/setup_build_env.sh
   - set
   - ccache --zero-stats
-  - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
+  - cp -r src.orig $FLAVOR_BUILD_DIR
+  - cd $FLAVOR_BUILD_DIR
   - NUM_PROC=4 tools/staticbuild/build.sh cpu
   - tools/staticbuild/build_wheel.sh
   - ccache -s
@@ -570,6 +581,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 5e345403c04ca7a57fa865ef4dbbd6d972160695b4b5007302fd3c6e1f588033
+hmac: 382bc1847cd535b39c1e60a6382d3054b11a446284731814185df54911cc6085
 
 ...
