@@ -6,7 +6,7 @@ image_pull_secrets:
 kind: pipeline
 name: sanity
 node:
-  hw: c5.9xlarge
+  hw: c5.18xlarge
 platform:
   arch: amd64
   os: linux
@@ -31,7 +31,7 @@ steps:
   - ccache --zero-stats
   - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j32
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -103,7 +103,7 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -112,7 +112,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-openblas
 - commands:
   - . /ci/setup_test_env.sh
@@ -128,7 +128,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -143,7 +143,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_scala_cpu
   name: test-openblas-scala-prep
 - commands:
   - . /ci/setup_test_env.sh
@@ -158,7 +158,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_scala_cpu
   name: test-openblas-scala
 - commands:
   - . /ci/setup_test_env.sh
@@ -176,7 +176,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_clojure_cpu
   name: test-openblas-clojure
 - commands:
   - . /ci/setup_test_env.sh
@@ -194,7 +194,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_clojure_cpu
   name: test-openblas-clojure-integration
 - commands:
   - . /ci/setup_test_env.sh
@@ -207,7 +207,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-perl
 - commands:
   - . /ci/setup_test_env.sh
@@ -220,7 +220,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-r
 - commands:
   - . /ci/setup_test_env.sh
@@ -240,7 +240,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-julia-0.7
 - commands:
   - . /ci/setup_test_env.sh
@@ -260,7 +260,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-julia-1.0
 - commands:
   - . /ci/setup_test_env.sh
@@ -273,7 +273,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-onnx
 - commands:
   - . /ci/setup_build_env.sh
@@ -295,7 +295,7 @@ steps:
   environment:
     FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-openblas-debug
 - commands:
   - . /ci/setup_test_env.sh
@@ -311,7 +311,7 @@ steps:
   environment:
     FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-debug-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -328,7 +328,7 @@ steps:
   environment:
     FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-debug-cpp
 - commands:
   - . /ci/setup_build_env.sh
@@ -347,7 +347,7 @@ steps:
   environment:
     FLAVOR: mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-mkl
 - commands:
   - . /ci/setup_test_env.sh
@@ -363,7 +363,7 @@ steps:
   environment:
     FLAVOR: mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-mkl-python3
 - commands:
   - . /ci/setup_build_env.sh
@@ -381,7 +381,7 @@ steps:
   environment:
     FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-mkldnn
 - commands:
   - . /ci/setup_test_env.sh
@@ -394,7 +394,7 @@ steps:
   environment:
     FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-mkldnn-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -407,7 +407,7 @@ steps:
   environment:
     FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-mkldnn-scala
 - commands:
   - . /ci/setup_test_env.sh
@@ -420,7 +420,7 @@ steps:
   environment:
     FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-mkldnn-r
 - commands:
   - . /ci/setup_build_env.sh
@@ -438,7 +438,7 @@ steps:
   environment:
     FLAVOR: mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-mkldnn-mkl
 - commands:
   - . /ci/setup_test_env.sh
@@ -451,7 +451,7 @@ steps:
   environment:
     FLAVOR: mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-mkldnn-mkl-python3
 - commands:
   - . /ci/setup_build_env.sh
@@ -472,7 +472,7 @@ steps:
   environment:
     FLAVOR: int64
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-int64
 - commands:
   - . /ci/setup_build_env.sh
@@ -494,7 +494,7 @@ steps:
   environment:
     FLAVOR: openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-openblas-no-tvm-op
 - commands:
   - . /ci/setup_test_env.sh
@@ -510,7 +510,7 @@ steps:
   environment:
     FLAVOR: openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
   - . /ci/setup_build_env.sh
@@ -573,6 +573,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: d8dc0f785612ec3a8f0bc1b7b28e94966beaccb5e9db9d2e9e12742535869ea4
+hmac: 92154a5302973a0bef2bb50ab27cf0abe3927893929df55c8320abef39300d96
 
 ...
