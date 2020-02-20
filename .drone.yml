@@ -31,7 +31,7 @@ steps:
   - ccache --zero-stats
   - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j 64
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -103,7 +103,7 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j4
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -135,6 +135,7 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
+  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
   - scala-package/core/scripts/get_cifar_data.sh
   - scala-package/core/scripts/get_mnist_data.sh
   - cd scala-package
@@ -151,6 +152,7 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
+  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
   - cd scala-package
   - mvn -B verify -DskipTests=false
   depends_on:
@@ -165,6 +167,7 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
+  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
   - cd contrib/clojure-package
   - lein test
   - lein cloverage --codecov
@@ -180,6 +183,7 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
+  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
   - cd contrib/clojure-package
   - lein install
   - EXAMPLES_HOME=$MXNET_HOME/contrib/clojure-package/examples
@@ -282,7 +286,7 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
     -G Ninja ..
-  - ninja -j 4
+  - ninja
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -334,7 +338,7 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
-    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j4
+    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -369,7 +373,6 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
-    -j4
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -427,7 +430,6 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel/
-    -j4
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -461,7 +463,7 @@ steps:
   - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
-  - ninja -j 4
+  - ninja
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -483,7 +485,7 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja ..
-  - ninja -j 4
+  - ninja
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -571,6 +573,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: b71b64f2dbd7e3899bd6b873f887773c72e3f22a9e73a11259ab86bef9e37dc4
+hmac: a06eac131894566164bddc0ab6cebe8cda1d2de5e16f8c18993d04c3c7cf22c0
 
 ...
