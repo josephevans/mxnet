@@ -148,12 +148,28 @@ steps:
 - commands:
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
+  - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+  - scala-package/core/scripts/get_cifar_data.sh
+  - scala-package/core/scripts/get_mnist_data.sh
+  - cd scala-package
+  - mvn -B install
+  depends_on:
+  - compile-openblas
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    MXNET_HOME: /drone/src/unix-cpu-openblas
+    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  name: test-openblas-scala-prep
+- commands:
+  - cd $FLAVOR_BUILD_DIR
+  - pwd && ls -liaF && find . -name libmxnet.so
   - export DMLC_LOG_STACK_TRACE_DEPTH=10
   - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
   - cd scala-package
   - mvn -B verify -DskipTests=false
   depends_on:
-  - compile-openblas
+  - test-openblas-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/unix-cpu-openblas
@@ -164,13 +180,11 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
-  - cd scala-package
-  - mvn -B install
-  - cd ../contrib/clojure-package
+  - cd contrib/clojure-package
   - lein test
   - lein cloverage --codecov
   depends_on:
-  - compile-openblas
+  - test-openblas-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/unix-cpu-openblas
@@ -180,15 +194,13 @@ steps:
 - commands:
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - cd scala-package
-  - mvn -B install
-  - cd ../contrib/clojure-package
+  - cd contrib/clojure-package
   - lein install
   - EXAMPLES_HOME=$MXNET_HOME/contrib/clojure-package/examples
   - TEST_CASES=$(find ${EXAMPLES_HOME} -name test | awk '!/dontselect1|cnn-text-classification|gan|neural-style|pre-trained-models|profiler/')
   - for i in $TEST_CASES; do cd $i && lein test && cd ..; done
   depends_on:
-  - compile-openblas
+  - test-openblas-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     MXNET_HOME: /drone/src/unix-cpu-openblas
@@ -624,6 +636,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 83a4996080e182f2de844bee1d40fd28d724e6a729275b3cd7f8755e35a477c4
+hmac: b30db80b3727ec7b17d92b1685135e2673c9584ac199c976d0d16c1b0b1576de
 
 ...
