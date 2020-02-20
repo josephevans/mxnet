@@ -18,6 +18,7 @@ steps:
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache /drone/src/ccache --no-progress
     --size-only --quiet || true
+  - /ci/setup_ccache.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
@@ -90,6 +91,7 @@ steps:
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache /drone/src/ccache --no-progress
     --size-only --quiet || true
+  - /ci/setup_ccache.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
@@ -569,6 +571,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 332036e180257576306fc41588e2b6d59c88e1e7cf860cab22caa10d41fcff7f
+hmac: b71b64f2dbd7e3899bd6b873f887773c72e3f22a9e73a11259ab86bef9e37dc4
 
 ...
