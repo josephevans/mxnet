@@ -136,8 +136,6 @@ steps:
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
-  - scala-package/core/scripts/get_cifar_data.sh
-  - scala-package/core/scripts/get_mnist_data.sh
   - cd scala-package
   - mvn -B install -DskipTests=true
   depends_on:
@@ -573,6 +571,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: a06eac131894566164bddc0ab6cebe8cda1d2de5e16f8c18993d04c3c7cf22c0
+hmac: ee844b1e98b27b5d762c876dc605fc686affcee8f9af6dceba4176825a94749b
 
 ...
