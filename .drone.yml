@@ -18,7 +18,7 @@ steps:
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/sanity-ccache /drone/src/ccache --no-progress
     --size-only --quiet || true
-  - /ci/setup_build_env.sh
+  - /ci/setup_build_env.sh && /ci/setup_test_env.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
@@ -46,6 +46,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-basic
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd python && pip install -e . && cd ..
@@ -54,8 +55,6 @@ steps:
   - compile-basic
   environment:
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
-    MXNET_HOME: /drone/src/sanity-basic
-    MXNET_LIBRARY_PATH: /drone/src/sanity-basic/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-basic-python
 - commands:
@@ -93,7 +92,7 @@ steps:
   - cd ..
   - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache /drone/src/ccache --no-progress
     --size-only --quiet || true
-  - /ci/setup_build_env.sh
+  - /ci/setup_build_env.sh && /ci/setup_test_env.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
@@ -121,18 +120,9 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export PYTHONPATH=./python/
-  - export MXNET_MKLDNN_DEBUG=0
-  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - export MXNET_SUBGRAPH_VERBOSE=0
-  - export MXNET_ENABLE_CYTHON=0
-  - export DMLC_LOG_STACK_TRACE_DEPTH=10
-  - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
-    --cover-package=mxnet"
-  - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
-    warning,error"
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
     nosetests_unittest.xml tests/python/unittest
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
@@ -141,14 +131,12 @@ steps:
   - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-python3
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
   - scala-package/core/scripts/get_cifar_data.sh
   - scala-package/core/scripts/get_mnist_data.sh
   - cd scala-package
@@ -157,29 +145,24 @@ steps:
   - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-scala-prep
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export DMLC_LOG_STACK_TRACE_DEPTH=10
-  - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
   - cd scala-package
   - mvn -B verify -DskipTests=false
   depends_on:
   - test-openblas-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-scala
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
   - cd contrib/clojure-package
   - lein test
   - lein cloverage --codecov
@@ -187,11 +170,10 @@ steps:
   - test-openblas-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-clojure
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd contrib/clojure-package
@@ -203,11 +185,10 @@ steps:
   - test-openblas-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-clojure-integration
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
@@ -215,11 +196,10 @@ steps:
   - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-perl
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpu_R
@@ -227,11 +207,10 @@ steps:
   - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-r
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - export PATH="/work/julia07/bin:$PATH"
@@ -246,11 +225,10 @@ steps:
   - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-julia-0.7
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - export PATH="/work/julia10/bin:$PATH"
@@ -265,11 +243,10 @@ steps:
   - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-julia-1.0
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
@@ -277,8 +254,6 @@ steps:
   - compile-openblas
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-    MXNET_HOME: /drone/src/unix-cpu-openblas
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-onnx
 - commands:
@@ -308,18 +283,9 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas-debug
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export PYTHONPATH=./python/
-  - export MXNET_MKLDNN_DEBUG=0
-  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - export MXNET_SUBGRAPH_VERBOSE=0
-  - export MXNET_ENABLE_CYTHON=0
-  - export DMLC_LOG_STACK_TRACE_DEPTH=10
-  - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
-    --cover-package=mxnet"
-  - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
-    warning,error"
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
     nosetests_unittest.xml tests/python/unittest
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
@@ -328,11 +294,10 @@ steps:
   - compile-openblas-debug
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
-    MXNET_HOME: /drone/src/unix-cpu-openblas-debug
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-debug-python3
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - find . -name mxnet_unit_tests
@@ -344,8 +309,6 @@ steps:
   - compile-openblas-debug
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
-    MXNET_HOME: /drone/src/unix-cpu-openblas-debug
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-debug/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-debug-cpp
 - commands:
@@ -372,18 +335,9 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkl
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export PYTHONPATH=./python/
-  - export MXNET_MKLDNN_DEBUG=0
-  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - export MXNET_SUBGRAPH_VERBOSE=0
-  - export MXNET_ENABLE_CYTHON=0
-  - export DMLC_LOG_STACK_TRACE_DEPTH=10
-  - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
-    --cover-package=mxnet"
-  - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
-    warning,error"
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
     nosetests_unittest.xml tests/python/unittest
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
@@ -392,8 +346,6 @@ steps:
   - compile-mkl
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
-    MXNET_HOME: /drone/src/unix-cpu-mkl
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkl/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkl-python3
 - commands:
@@ -420,6 +372,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkldnn
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
@@ -427,11 +380,10 @@ steps:
   - compile-mkldnn
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-python3
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
@@ -439,11 +391,10 @@ steps:
   - compile-mkldnn
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-scala
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_minimal_R
@@ -451,8 +402,6 @@ steps:
   - compile-mkldnn
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-r
 - commands:
@@ -479,6 +428,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkldnn-mkl
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
@@ -486,8 +436,6 @@ steps:
   - compile-mkldnn-mkl
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
-    MXNET_HOME: /drone/src/unix-cpu-mkldnn-mkl
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-mkldnn-mkl/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-mkl-python3
 - commands:
@@ -542,18 +490,9 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas-no-tvm-op
 - commands:
+  - . ./drone-test.env
   - cd $FLAVOR_BUILD_DIR
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export PYTHONPATH=./python/
-  - export MXNET_MKLDNN_DEBUG=0
-  - export MXNET_STORAGE_FALLBACK_LOG_VERBOSE=0
-  - export MXNET_SUBGRAPH_VERBOSE=0
-  - export MXNET_ENABLE_CYTHON=0
-  - export DMLC_LOG_STACK_TRACE_DEPTH=10
-  - NOSE_COVERAGE_ARGUMENTS="--with-coverage --cover-inclusive --cover-xml --cover-branches
-    --cover-package=mxnet"
-  - NOSE_TIMER_ARGUMENTS="--with-timer --timer-ok 1 --timer-warning 15 --timer-filter
-    warning,error"
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
     nosetests_unittest.xml tests/python/unittest
   - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
@@ -562,8 +501,6 @@ steps:
   - compile-openblas-no-tvm-op
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
-    MXNET_HOME: /drone/src/unix-cpu-openblas-no-tvm-op
-    MXNET_LIBRARY_PATH: /drone/src/unix-cpu-openblas-no-tvm-op/lib/libmxnet.so
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
@@ -573,7 +510,6 @@ steps:
   - set
   - ccache --zero-stats
   - cp -r src.orig $${FLAVOR_BUILD_DIR} && cd $${FLAVOR_BUILD_DIR}
-  - MAVEN_OPTS="-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
   - NUM_PROC=4 mxnet_variant=cpu ./ci/publish/scala/build.sh
   - ccache -s
@@ -636,6 +572,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: b30db80b3727ec7b17d92b1685135e2673c9584ac199c976d0d16c1b0b1576de
+hmac: 21194a76c4ad49b8351d8930abb4ec6fe18ae0c3ed8e31afcaebf439317fe461
 
 ...
