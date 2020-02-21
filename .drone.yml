@@ -31,7 +31,7 @@ steps:
   - ccache --zero-stats
   - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j32
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j16
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -48,7 +48,7 @@ steps:
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd python && pip install -e . && cd ..
-  - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
+  - MXNET_TEST_COUNT=1 nosetests --processes=16 --nocapture tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - compile-basic
   environment:
@@ -103,7 +103,7 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j8
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j16
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -119,10 +119,10 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_quantization.xml tests/python/quantization
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
+    --xunit-file nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
+    --xunit-file nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas
   environment:
@@ -158,7 +158,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_scala_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-scala
 - commands:
   - . /ci/setup_test_env.sh
@@ -176,7 +176,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_clojure_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-clojure
 - commands:
   - . /ci/setup_test_env.sh
@@ -194,7 +194,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_clojure_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-clojure-integration
 - commands:
   - . /ci/setup_test_env.sh
@@ -325,7 +325,7 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
     -G Ninja ..
-  - ninja -j8
+  - ninja -j16
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -334,23 +334,23 @@ steps:
   environment:
     FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas-debug
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_quantization.xml tests/python/quantization
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
+    --xunit-file nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
+    --xunit-file nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas-debug
   environment:
     FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-debug-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -366,7 +366,7 @@ steps:
   environment:
     FLAVOR: openblas-debug
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-debug-cpp
 - commands:
   - ls -liaF && du -hs *
@@ -415,7 +415,7 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
-    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j8
+    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j16
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -431,10 +431,10 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_quantization.xml tests/python/quantization
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
+    --xunit-file nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
+    --xunit-file nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-mkl
   environment:
@@ -489,7 +489,7 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
-    -j8
+    -j16
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -586,7 +586,7 @@ steps:
   - set
   - ccache --zero-stats
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel
-    -j8
+    -j16
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -659,7 +659,7 @@ steps:
   - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
-  - ninja -j8
+  - ninja -j16
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -720,7 +720,7 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja ..
-  - ninja -j8
+  - ninja -j16
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -736,10 +736,10 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_quantization.xml tests/python/quantization
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
+    --xunit-file nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
+    --xunit-file nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
@@ -878,6 +878,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 0b3d5b1ac127b027e1efdb9144f62b23207b5b22ef98b54ea5e8d5604917d303
+hmac: 1fc0b6d942abc7c4c2cf04909ee4562f90b7f073a6015788fa50ea2a46f40295
 
 ...
