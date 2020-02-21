@@ -77,7 +77,7 @@ depends_on:
 image_pull_secrets:
 - dockerconfigjson
 kind: pipeline
-name: unix-cpu
+name: unix-cpu-openblas
 node:
   hw: c5.18xlarge
 platform:
@@ -89,8 +89,8 @@ steps:
   - /usr/local/bin/clone-commit
   - git submodule update --init --recursive
   - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-ccache /drone/src/ccache --no-progress
-    --size-only --quiet || true
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-openblas-ccache /drone/src/ccache
+    --no-progress --size-only --quiet || true
   - /ci/setup_ccache.sh
   - ls -liaF && du -hs *
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
@@ -111,7 +111,7 @@ steps:
   - clone-src
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-openblas
 - commands:
@@ -127,7 +127,7 @@ steps:
   - compile-openblas
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-python3
 - commands:
@@ -142,7 +142,7 @@ steps:
   - compile-openblas
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_scala_cpu
   name: test-openblas-scala-prep
 - commands:
@@ -157,7 +157,7 @@ steps:
   - test-openblas-scala-prep
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_scala_cpu
   name: test-openblas-scala
 - commands:
@@ -175,7 +175,7 @@ steps:
   - test-openblas-scala-prep
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_clojure_cpu
   name: test-openblas-clojure
 - commands:
@@ -193,7 +193,7 @@ steps:
   - test-openblas-scala-prep
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_clojure_cpu
   name: test-openblas-clojure-integration
 - commands:
@@ -206,8 +206,8 @@ steps:
   - compile-openblas
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-perl
 - commands:
   - . /ci/setup_test_env.sh
@@ -219,8 +219,8 @@ steps:
   - compile-openblas
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-r
 - commands:
   - . /ci/setup_test_env.sh
@@ -239,8 +239,8 @@ steps:
   - compile-openblas
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-julia-0.7
 - commands:
   - . /ci/setup_test_env.sh
@@ -259,8 +259,8 @@ steps:
   - compile-openblas
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-julia-1.0
 - commands:
   - . /ci/setup_test_env.sh
@@ -272,9 +272,48 @@ steps:
   - compile-openblas
   environment:
     FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-onnx
+- commands:
+  - ls -liaF && du -hs *
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-ccache
+    --delete --no-progress --size-only --quiet || true
+  depends_on:
+  - compile-openblas
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-openblas-debug
+node:
+  hw: c5.18xlarge
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  - cd ..
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-openblas-debug-ccache /drone/src/ccache
+    --no-progress --size-only --quiet || true
+  - /ci/setup_ccache.sh
+  - ls -liaF && du -hs *
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cp -r src.orig $FLAVOR_BUILD_DIR
@@ -294,7 +333,7 @@ steps:
   - clone-src
   environment:
     FLAVOR: openblas-debug
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-openblas-debug
 - commands:
@@ -310,7 +349,7 @@ steps:
   - compile-openblas-debug
   environment:
     FLAVOR: openblas-debug
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-debug-python3
 - commands:
@@ -326,9 +365,48 @@ steps:
   - compile-openblas-debug
   environment:
     FLAVOR: openblas-debug
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-debug-cpp
+- commands:
+  - ls -liaF && du -hs *
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-debug-ccache
+    --delete --no-progress --size-only --quiet || true
+  depends_on:
+  - compile-openblas-debug
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-mkl
+node:
+  hw: c5.18xlarge
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  - cd ..
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-mkl-ccache /drone/src/ccache --no-progress
+    --size-only --quiet || true
+  - /ci/setup_ccache.sh
+  - ls -liaF && du -hs *
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cp -r src.orig $FLAVOR_BUILD_DIR
@@ -345,7 +423,7 @@ steps:
   - clone-src
   environment:
     FLAVOR: mkl
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl-mkl
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-mkl
 - commands:
@@ -361,9 +439,48 @@ steps:
   - compile-mkl
   environment:
     FLAVOR: mkl
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl-mkl
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-mkl-python3
+- commands:
+  - ls -liaF && du -hs *
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkl-ccache --delete
+    --no-progress --size-only --quiet || true
+  depends_on:
+  - compile-mkl
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-mkldnn
+node:
+  hw: c5.18xlarge
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  - cd ..
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-ccache /drone/src/ccache
+    --no-progress --size-only --quiet || true
+  - /ci/setup_ccache.sh
+  - ls -liaF && du -hs *
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cp -r src.orig $FLAVOR_BUILD_DIR
@@ -380,7 +497,7 @@ steps:
   - clone-src
   environment:
     FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-mkldnn
 - commands:
@@ -393,7 +510,7 @@ steps:
   - compile-mkldnn
   environment:
     FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-mkldnn-python3
 - commands:
@@ -406,8 +523,8 @@ steps:
   - compile-mkldnn
   environment:
     FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_scala_cpu
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-scala
 - commands:
   - . /ci/setup_test_env.sh
@@ -419,9 +536,48 @@ steps:
   - compile-mkldnn
   environment:
     FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-r
+- commands:
+  - ls -liaF && du -hs *
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-ccache
+    --delete --no-progress --size-only --quiet || true
+  depends_on:
+  - compile-mkldnn
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-mkldnn-mkl
+node:
+  hw: c5.18xlarge
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  - cd ..
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-mkl-ccache /drone/src/ccache
+    --no-progress --size-only --quiet || true
+  - /ci/setup_ccache.sh
+  - ls -liaF && du -hs *
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cp -r src.orig $FLAVOR_BUILD_DIR
@@ -438,7 +594,7 @@ steps:
   - clone-src
   environment:
     FLAVOR: mkldnn-mkl
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl-mkldnn-mkl
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-mkldnn-mkl
 - commands:
@@ -451,9 +607,48 @@ steps:
   - compile-mkldnn-mkl
   environment:
     FLAVOR: mkldnn-mkl
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl-mkldnn-mkl
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-mkldnn-mkl-python3
+- commands:
+  - ls -liaF && du -hs *
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-mkl-ccache
+    --delete --no-progress --size-only --quiet || true
+  depends_on:
+  - compile-mkldnn-mkl
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-int64
+node:
+  hw: c5.18xlarge
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  - cd ..
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-int64-ccache /drone/src/ccache
+    --no-progress --size-only --quiet || true
+  - /ci/setup_ccache.sh
+  - ls -liaF && du -hs *
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cp -r src.orig $FLAVOR_BUILD_DIR
@@ -472,9 +667,48 @@ steps:
   - clone-src
   environment:
     FLAVOR: int64
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64-int64
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-int64
+- commands:
+  - ls -liaF && du -hs *
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-int64-ccache
+    --delete --no-progress --size-only --quiet || true
+  depends_on:
+  - compile-int64
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-openblas-no-tvm-op
+node:
+  hw: c5.18xlarge
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  - cd ..
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-openblas-no-tvm-op-ccache /drone/src/ccache
+    --no-progress --size-only --quiet || true
+  - /ci/setup_ccache.sh
+  - ls -liaF && du -hs *
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cp -r src.orig $FLAVOR_BUILD_DIR
@@ -494,7 +728,7 @@ steps:
   - clone-src
   environment:
     FLAVOR: openblas-no-tvm-op
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op-openblas-no-tvm-op
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: compile-openblas-no-tvm-op
 - commands:
@@ -510,9 +744,48 @@ steps:
   - compile-openblas-no-tvm-op
   environment:
     FLAVOR: openblas-no-tvm-op
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op-openblas-no-tvm-op
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
   name: test-openblas-no-tvm-op-python3
+- commands:
+  - ls -liaF && du -hs *
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-no-tvm-op-ccache
+    --delete --no-progress --size-only --quiet || true
+  depends_on:
+  - compile-openblas-no-tvm-op
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-static-scala
+node:
+  hw: c5.18xlarge
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  - cd ..
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-static-scala-ccache /drone/src/ccache
+    --no-progress --size-only --quiet || true
+  - /ci/setup_ccache.sh
+  - ls -liaF && du -hs *
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cp -r src.orig $FLAVOR_BUILD_DIR
@@ -529,9 +802,48 @@ steps:
   - clone-src
   environment:
     FLAVOR: static-scala
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-scala
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-scala-static-scala
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile-static-scala
+- commands:
+  - ls -liaF && du -hs *
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-static-scala-ccache
+    --delete --no-progress --size-only --quiet || true
+  depends_on:
+  - compile-static-scala
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-static-python
+node:
+  hw: c5.18xlarge
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - mkdir -p src.orig && cd src.orig
+  - /usr/local/bin/clone-commit
+  - git submodule update --init --recursive
+  - cd ..
+  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-static-python-ccache /drone/src/ccache
+    --no-progress --size-only --quiet || true
+  - /ci/setup_ccache.sh
+  - ls -liaF && du -hs *
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cp -r src.orig $FLAVOR_BUILD_DIR
@@ -548,23 +860,15 @@ steps:
   - clone-src
   environment:
     FLAVOR: static-python
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python-static-python
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile-static-python
 - commands:
   - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-ccache --delete
-    --no-progress --size-only --quiet || true
+  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-static-python-ccache
+    --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-int64
-  - compile-mkl
-  - compile-mkldnn
-  - compile-mkldnn-mkl
-  - compile-openblas
-  - compile-openblas-debug
-  - compile-openblas-no-tvm-op
   - compile-static-python
-  - compile-static-scala
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -574,6 +878,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 5dee8c769fbfc773c3e0c5631080f8f48b9404862002fc0fe5e2def604672b7f
+hmac: 0b3d5b1ac127b027e1efdb9144f62b23207b5b22ef98b54ea5e8d5604917d303
 
 ...
