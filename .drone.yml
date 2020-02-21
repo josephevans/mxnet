@@ -143,7 +143,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_scala_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-scala-prep
 - commands:
   - . /ci/setup_test_env.sh
@@ -878,6 +878,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 880ac31b1be70fb47bf2ef8b070f0d983e3af754375709ce0c3ec465d40fcaa5
+hmac: 04cd64e3364ceb46d62a49ccf2808cfe09bc50a5279b2fc615437ca8ce9b4670
 
 ...
