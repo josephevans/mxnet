@@ -40,7 +40,7 @@ steps:
   environment:
     FLAVOR: basic
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-basic
 - commands:
   - . /ci/setup_test_env.sh
@@ -54,7 +54,7 @@ steps:
   environment:
     FLAVOR: basic
     FLAVOR_BUILD_DIR: /drone/src/sanity-basic
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-basic-python
 - commands:
   - ls -liaF && du -hs *
@@ -128,7 +128,7 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -878,6 +878,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 1fc0b6d942abc7c4c2cf04909ee4562f90b7f073a6015788fa50ea2a46f40295
+hmac: 08d41edc3a4100bcaa5a3048d90c174541f8ee880ef3eaebea208dad100ec33c
 
 ...
