@@ -48,7 +48,7 @@ steps:
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd python && pip install -e . && cd ..
-  - MXNET_TEST_COUNT=1 nosetests --processes=16 --nocapture tests/python/unittest/test_operator.py:test_norm
+  - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
   depends_on:
   - compile-basic
   environment:
@@ -878,6 +878,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 08d41edc3a4100bcaa5a3048d90c174541f8ee880ef3eaebea208dad100ec33c
+hmac: 74e7fd217ce2fb9e2f6ccc583b22c6064bfd240879ccac47a590745539d01c36
 
 ...
