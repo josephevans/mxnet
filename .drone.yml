@@ -119,10 +119,10 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
-    --xunit-file nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
-    --xunit-file nosetests_quantization.xml tests/python/quantization
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas
   environment:
@@ -341,10 +341,10 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
-    --xunit-file nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
-    --xunit-file nosetests_quantization.xml tests/python/quantization
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas-debug
   environment:
@@ -431,10 +431,10 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
-    --xunit-file nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
-    --xunit-file nosetests_quantization.xml tests/python/quantization
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-mkl
   environment:
@@ -729,23 +729,23 @@ steps:
   environment:
     FLAVOR: openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op-openblas-no-tvm-op
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas-no-tvm-op
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
-    --xunit-file nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --processes=8 --with-xunit
-    --xunit-file nosetests_quantization.xml tests/python/quantization
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_unittest.xml tests/python/unittest
+  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
+    nosetests_quantization.xml tests/python/quantization
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
     FLAVOR: openblas-no-tvm-op
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op-openblas-no-tvm-op
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-openblas-no-tvm-op-python3
 - commands:
   - ls -liaF && du -hs *
@@ -878,6 +878,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 74e7fd217ce2fb9e2f6ccc583b22c6064bfd240879ccac47a590745539d01c36
+hmac: 880ac31b1be70fb47bf2ef8b070f0d983e3af754375709ce0c3ec465d40fcaa5
 
 ...
