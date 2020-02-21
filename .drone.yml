@@ -336,7 +336,6 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - . /opt/intel/bin/compilervars.sh intel64
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j8
   - ccache -s
@@ -430,7 +429,6 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - . /opt/intel/bin/compilervars.sh intel64
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel
     -j8
   - ccache -s
@@ -576,6 +574,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 15b079792f4a30677e3844790881853c1221ee012d1357534bccb0c63a8d61f2
+hmac: 9591bac079b9297f49c6fb1aee4c19f03935b47d2d19af762a552cdcfdcf4e94
 
 ...
