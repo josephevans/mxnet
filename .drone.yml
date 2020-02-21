@@ -407,7 +407,7 @@ steps:
   environment:
     FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_scala_cpu
   name: test-mkldnn-scala
 - commands:
   - . /ci/setup_test_env.sh
@@ -420,7 +420,7 @@ steps:
   environment:
     FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-r
 - commands:
   - . /ci/setup_build_env.sh
@@ -574,6 +574,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 9591bac079b9297f49c6fb1aee4c19f03935b47d2d19af762a552cdcfdcf4e94
+hmac: 5dee8c769fbfc773c3e0c5631080f8f48b9404862002fc0fe5e2def604672b7f
 
 ...
