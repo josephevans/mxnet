@@ -102,8 +102,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j16
+  - /work/runtime_functions.sh build_ubuntu_cpu
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -112,17 +111,14 @@ steps:
   environment:
     FLAVOR: openblas
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-openblas
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_quantization.xml tests/python/quantization
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas
   environment:
@@ -227,14 +223,7 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export PATH="/work/julia07/bin:$PATH"
-  - export JULIA_DEPOT_PATH='/work/julia-depot'
-  - export INTEGRATION_TEST=1
-  - julia -e 'using InteractiveUtils; versioninfo()'
-  - julia --project=./julia -e 'using Pkg; Pkg.build("MXNet")'
-  - julia --project=./julia -e 'using Pkg; Pkg.test("MXNet")'
-  - julia --project=./julia -e 'using MXNet; mx._sig_checker()'
-  - ls -liaF /work && ls -liaF /work/julia07
+  - /work/runtime_functions.sh unittest_ubuntu_cpu_julia07
   depends_on:
   - compile-openblas
   environment:
@@ -247,14 +236,7 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - export PATH="/work/julia10/bin:$PATH"
-  - export JULIA_DEPOT_PATH='/work/julia-depot'
-  - export INTEGRATION_TEST=1
-  - julia -e 'using InteractiveUtils; versioninfo()'
-  - julia --project=./julia -e 'using Pkg; Pkg.build("MXNet")'
-  - julia --project=./julia -e 'using Pkg; Pkg.test("MXNet")'
-  - julia --project=./julia -e 'using MXNet; mx._sig_checker()'
-  - ls -liaF /work && ls -liaF /work/julia10
+  - /work/runtime_functions.sh
   depends_on:
   - compile-openblas
   environment:
@@ -341,10 +323,7 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_quantization.xml tests/python/quantization
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas-debug
   environment:
@@ -424,23 +403,20 @@ steps:
   environment:
     FLAVOR: mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkl
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_quantization.xml tests/python/quantization
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-mkl
   environment:
     FLAVOR: mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkl-python3
 - commands:
   - ls -liaF && du -hs *
@@ -498,7 +474,7 @@ steps:
   environment:
     FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkldnn
 - commands:
   - . /ci/setup_test_env.sh
@@ -511,7 +487,7 @@ steps:
   environment:
     FLAVOR: mkldnn
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -595,7 +571,7 @@ steps:
   environment:
     FLAVOR: mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl-mkldnn-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-mkldnn-mkl
 - commands:
   - . /ci/setup_test_env.sh
@@ -608,7 +584,7 @@ steps:
   environment:
     FLAVOR: mkldnn-mkl
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl-mkldnn-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-mkldnn-mkl-python3
 - commands:
   - ls -liaF && du -hs *
@@ -668,7 +644,7 @@ steps:
   environment:
     FLAVOR: int64
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64-int64
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/unix_build_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile-int64
 - commands:
   - ls -liaF && du -hs *
@@ -736,10 +712,7 @@ steps:
   - cd $FLAVOR_BUILD_DIR
   - set
   - pwd && ls -liaF && find . -name libmxnet.so
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_unittest.xml tests/python/unittest
-  - nosetests-3.4 $NOSE_COVERAGE_ARGUMENTS $NOSE_TIMER_ARGUMENTS --with-xunit --xunit-file
-    nosetests_quantization.xml tests/python/quantization
+  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile-openblas-no-tvm-op
   environment:
@@ -878,6 +851,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 04cd64e3364ceb46d62a49ccf2808cfe09bc50a5279b2fc615437ca8ce9b4670
+hmac: 9d767a208b368557c8842609d4b482bc72def9769dd3c160f177480e76aa4a33
 
 ...
