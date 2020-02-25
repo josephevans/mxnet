@@ -32,7 +32,7 @@ steps:
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j8
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -884,6 +884,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: ce386e3e08ada88af2e9a8b7db05bafb8216ea43962cd0592c3b021213663e31
+hmac: cbfdbeb5bc244ac3ff5cb97017758a8eac2096bf238db4a78c3e89a326ddddbb
 
 ...
