@@ -32,7 +32,7 @@ steps:
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
-    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j16
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -321,7 +321,7 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
     -G Ninja ..
-  - ninja -j16
+  - ninja -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -411,7 +411,7 @@ steps:
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
-    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j16
+    USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -484,7 +484,7 @@ steps:
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
-    -j16
+    -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -585,7 +585,7 @@ steps:
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel
-    -j16
+    -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -660,7 +660,7 @@ steps:
   - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
-  - ninja -j16
+  - ninja -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -722,7 +722,7 @@ steps:
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja ..
-  - ninja -j16
+  - ninja -j8
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -880,6 +880,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 4be4c1c31261ecb590aac93b5d7c8cea53def92e72ec29823f01a0000feb73ba
+hmac: 1144a436e7cc750f7da672a3b9650b653f544989e2d46c7ab8957747d61e14da
 
 ...
