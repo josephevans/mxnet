@@ -225,6 +225,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
+  - apt-get -y build-dep libcurl4-gnutls-dev
+  - apt-get -y install libcurl4-gnutls-dev
   - /work/runtime_functions.sh unittest_ubuntu_cpu_R
   depends_on:
   - compile-openblas
@@ -893,6 +895,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: f5aeeedf9f465f36eceae15840a8367be421de926b81631c8ae86f827603216f
+hmac: 81c298ff843b962000c843b9b003da4304de4dfecab3f2a608fadd755cd4879d
 
 ...
