@@ -172,8 +172,8 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
     /root/.m2
-  - MXNET_HOME=$FLAVOR_BUILD_DIR/data contrib/clojure-package/scripts/get_cifar_data.sh
-  - MXNET_HOME=$FLAVOR_BUILD_DIR/data contrib/clojure-package/scripts/get_mnist_data.sh
+  - MXNET_HOME=$FLAVOR_BUILD_DIR contrib/clojure-package/scripts/get_cifar_data.sh
+  - MXNET_HOME=$FLAVOR_BUILD_DIR contrib/clojure-package/scripts/get_mnist_data.sh
   - cd contrib/clojure-package
   - lein test
   - lein cloverage --codecov
@@ -884,6 +884,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: cbfdbeb5bc244ac3ff5cb97017758a8eac2096bf238db4a78c3e89a326ddddbb
+hmac: 641038d0f499689c19b3a15c0191067a847748f073e65080c137ca8dace40e5a
 
 ...
