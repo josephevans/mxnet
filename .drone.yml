@@ -29,6 +29,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 USE_JEMALLOC=1 -j16
@@ -46,6 +47,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - cd python && pip install -e . && cd ..
   - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
@@ -102,6 +104,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - /work/runtime_functions.sh build_ubuntu_cpu
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -117,6 +120,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
@@ -130,6 +134,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
   - cd scala-package
@@ -145,6 +150,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
   - cd scala-package
@@ -160,6 +166,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
   - MXNET_HOME=$FLAVOR_BUILD_DIR/data contrib/clojure-package/scripts/get_cifar_data.sh
@@ -178,6 +185,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
   - cd contrib/clojure-package
@@ -196,6 +204,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
@@ -209,6 +218,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpu_R
   depends_on:
@@ -222,6 +232,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpu_julia07
   depends_on:
@@ -235,6 +246,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh
   depends_on:
@@ -248,6 +260,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
   depends_on:
@@ -303,6 +316,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
@@ -322,6 +336,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
@@ -335,6 +350,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - find . -name mxnet_unit_tests
   - ls -liaF build/tests/mxnet_unit_tests
@@ -393,6 +409,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j16
   - ccache -s
@@ -409,6 +426,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
@@ -464,6 +482,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j16
   - ccache -s
@@ -480,6 +499,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
@@ -493,6 +513,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
   depends_on:
@@ -506,6 +527,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_minimal_R
   depends_on:
@@ -561,6 +583,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel
     -j16
   - ccache -s
@@ -577,6 +600,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
@@ -632,6 +656,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
@@ -692,6 +717,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
@@ -711,6 +737,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
@@ -766,6 +793,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
   - NUM_PROC=8 mxnet_variant=cpu ./ci/publish/scala/build.sh
   - ccache -s
@@ -824,6 +852,7 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - NUM_PROC=8 tools/staticbuild/build.sh cpu
   - tools/staticbuild/build_wheel.sh
   - ccache -s
@@ -851,6 +880,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 9d767a208b368557c8842609d4b482bc72def9769dd3c160f177480e76aa4a33
+hmac: 4be4c1c31261ecb590aac93b5d7c8cea53def92e72ec29823f01a0000feb73ba
 
 ...
