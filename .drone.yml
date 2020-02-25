@@ -106,6 +106,7 @@ steps:
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - /work/runtime_functions.sh build_ubuntu_cpu
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -326,6 +327,7 @@ steps:
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
     -G Ninja ..
   - ninja -j8
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -416,6 +418,7 @@ steps:
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j8
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -489,6 +492,7 @@ steps:
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j8
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -590,6 +594,7 @@ steps:
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel
     -j8
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -665,6 +670,7 @@ steps:
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
   - ninja -j8
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -727,6 +733,7 @@ steps:
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja ..
   - ninja -j8
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -800,6 +807,7 @@ steps:
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
   - NUM_PROC=8 mxnet_variant=cpu ./ci/publish/scala/build.sh
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -859,6 +867,7 @@ steps:
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - NUM_PROC=8 tools/staticbuild/build.sh cpu
   - tools/staticbuild/build_wheel.sh
+  - find / -name libmxnet.so
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -884,6 +893,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 641038d0f499689c19b3a15c0191067a847748f073e65080c137ca8dace40e5a
+hmac: f5aeeedf9f465f36eceae15840a8367be421de926b81631c8ae86f827603216f
 
 ...
