@@ -136,7 +136,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
-  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
+  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
+    /root/.m2
   - cd scala-package
   - mvn -B install -DskipTests=true
   depends_on:
@@ -152,7 +153,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
-  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
+  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
+    /root/.m2
   - cd scala-package
   - mvn -B verify -DskipTests=false
   depends_on:
@@ -168,7 +170,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
-  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
+  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
+    /root/.m2
   - MXNET_HOME=$FLAVOR_BUILD_DIR/data contrib/clojure-package/scripts/get_cifar_data.sh
   - MXNET_HOME=$FLAVOR_BUILD_DIR/data contrib/clojure-package/scripts/get_mnist_data.sh
   - cd contrib/clojure-package
@@ -187,7 +190,8 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
-  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2 /root/.m2
+  - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
+    /root/.m2
   - cd contrib/clojure-package
   - lein install
   - TEST_CASES=$(find $MXNET_HOME/contrib/clojure-package/examples -name test -type
@@ -248,7 +252,7 @@ steps:
   - set
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
-  - /work/runtime_functions.sh
+  - /work/runtime_functions.sh unittest_ubuntu_cpu_julia10
   depends_on:
   - compile-openblas
   environment:
@@ -880,6 +884,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 1144a436e7cc750f7da672a3b9650b653f544989e2d46c7ab8957747d61e14da
+hmac: ce386e3e08ada88af2e9a8b7db05bafb8216ea43962cd0592c3b021213663e31
 
 ...
