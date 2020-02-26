@@ -30,6 +30,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - pwd && ls -liaF
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j8
@@ -105,6 +106,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_cpu
   - find / -name libmxnet.so
   - ccache -s
@@ -325,6 +327,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
@@ -419,6 +422,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - make DEV=1 USE_CPP_PACKAGE=1 USE_BLAS=mkl USE_TVM_OP=1 USE_MKLDNN=0 USE_INTEL_PATH=/opt/intel
     USE_DIST_KVSTORE=1 USE_SIGNAL_HANDLER=1 -j8
   - find / -name libmxnet.so
@@ -493,6 +497,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=openblas USE_SIGNAL_HANDLER=1
     -j8
   - find / -name libmxnet.so
@@ -595,6 +600,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - make DEV=1 USE_CPP_PACKAGE=1 USE_TVM_OP=1 USE_BLAS=mkl USE_SIGNAL_HANDLER=1 USE_INTEL_PATH=/opt/intel
     -j8
   - find / -name libmxnet.so
@@ -669,6 +675,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - mkdir build && cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
@@ -731,6 +738,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - mkdir build && cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
@@ -808,6 +816,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
   - NUM_PROC=8 mxnet_variant=cpu ./ci/publish/scala/build.sh
   - find / -name libmxnet.so
@@ -868,6 +877,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - NUM_PROC=8 tools/staticbuild/build.sh cpu
   - tools/staticbuild/build_wheel.sh
   - find / -name libmxnet.so
@@ -928,6 +938,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_mkldnn
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -986,6 +997,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_mkldnn_nocudnn
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1044,6 +1056,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1102,6 +1115,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_cmake_mkldnn
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1160,6 +1174,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_cmake
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1218,6 +1233,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_tensorrt
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1276,6 +1292,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_large_tensor
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1334,6 +1351,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_no_tvm_op
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1392,6 +1410,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1450,6 +1469,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1508,6 +1528,7 @@ steps:
   - set
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - mkdir -p $FLAVOR_BUILD_DIR/build
   - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_mkldnn_cpp_test
   - ccache -s
   - pwd && find . -name libmxnet.so
@@ -1534,6 +1555,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 777a6d79e36afd2341168add24a3677494821d57ed3fdf764ddc0dbcd12d7316
+hmac: af83f9817d9e995b134157d3660b2d16a9cc6411a7684af5ba3f5dc744fa2253
 
 ...
