@@ -6,7 +6,7 @@ image_pull_secrets:
 kind: pipeline
 name: sanity
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -81,7 +81,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-openblas
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -301,7 +301,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-openblas-debug
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -395,7 +395,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-mkl
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -469,7 +469,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-mkldnn
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -571,7 +571,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-mkldnn-mkl
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -645,7 +645,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-int64
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -707,7 +707,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-openblas-no-tvm-op
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -784,7 +784,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-static-scala
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -844,7 +844,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-cpu-static-python
 node:
-  hw: c5.18xlarge
+  hw: linuxcpu
 platform:
   arch: amd64
   os: linux
@@ -904,7 +904,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-mkldnn
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -962,7 +962,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-mkldnn-nocudnn
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1020,7 +1020,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-full
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1078,7 +1078,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-cmake-mkldnn
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1136,7 +1136,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-cmake
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1194,7 +1194,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-tensorrt
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1252,7 +1252,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-int64
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1310,7 +1310,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-no-tvm
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1368,7 +1368,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-cmake-no-tvm
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1426,7 +1426,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-cmake-no-rtc
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1484,7 +1484,7 @@ image_pull_secrets:
 kind: pipeline
 name: unix-gpu-mkldnn-cpp
 node:
-  hw: g3.16xlarge
+  hw: linuxgpu
 platform:
   arch: amd64
   os: linux
@@ -1534,6 +1534,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: ad52f42f89ca4caaac62bc8a89cb79f4f0bc39fd45836b15ea9192e5bb2ceb0c
+hmac: 777a6d79e36afd2341168add24a3677494821d57ed3fdf764ddc0dbcd12d7316
 
 ...
