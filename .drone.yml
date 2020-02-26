@@ -228,7 +228,6 @@ steps:
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - apt-get update
-  - apt-get -y build-dep libcurl4-gnutls-dev
   - apt-get -y install libcurl4-gnutls-dev
   - /work/runtime_functions.sh unittest_ubuntu_cpu_R
   depends_on:
@@ -328,7 +327,7 @@ steps:
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
-  - mkdir build && cd build
+  - cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=ON -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Debug
     -G Ninja ..
@@ -676,7 +675,7 @@ steps:
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
-  - mkdir build && cd build
+  - cd build
   - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
     -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
   - ninja -j8
@@ -739,7 +738,7 @@ steps:
   - ccache --zero-stats
   - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
-  - mkdir build && cd build
+  - cd build
   - cmake -DUSE_CUDA=OFF -DUSE_TVM_OP=OFF -DPython3_EXECUTABLE=/usr/bin/python3 -DUSE_MKL_IF_AVAILABLE=OFF
     -DUSE_OPENMP=OFF -DUSE_OPENCV=ON -DUSE_SIGNAL_HANDLER=ON -DCMAKE_BUILD_TYPE=Release
     -G Ninja ..
@@ -1005,16 +1004,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn-mkldnn
+    FLAVOR: mkldnn-no-cudnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn-mkldnn-no-cudnn
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-mkldnn
+  name: compile-mkldnn-no-cudnn
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-nocudnn-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-mkldnn-no-cudnn
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1064,16 +1063,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full-mkldnn
+    FLAVOR: gpu-full
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full-gpu-full
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-mkldnn
+  name: compile-gpu-full
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-full-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-gpu-full
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1123,16 +1122,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn-mkldnn
+    FLAVOR: mkldnn-cmake
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn-mkldnn-cmake
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-mkldnn
+  name: compile-mkldnn-cmake
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-mkldnn-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-mkldnn-cmake
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1182,16 +1181,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn
+    FLAVOR: gpu-cmake
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-gpu-cmake
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-mkldnn
+  name: compile-gpu-cmake
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-gpu-cmake
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1241,16 +1240,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt-mkldnn
+    FLAVOR: gpu-tensorrt
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt-gpu-tensorrt
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
-  name: compile-mkldnn
+  name: compile-gpu-tensorrt
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-tensorrt-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-gpu-tensorrt
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1300,16 +1299,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-int64-mkldnn
+    FLAVOR: gpu-int64
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-int64-gpu-int64
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-mkldnn
+  name: compile-gpu-int64
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-int64-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-gpu-int64
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1359,16 +1358,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm-mkldnn
+    FLAVOR: gpu-no-tvm
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm-gpu-no-tvm
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-mkldnn
+  name: compile-gpu-no-tvm
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-no-tvm-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-gpu-no-tvm
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1418,16 +1417,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-tvm-mkldnn
+    FLAVOR: gpu-cmake-no-tvm
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-tvm-gpu-cmake-no-tvm
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-mkldnn
+  name: compile-gpu-cmake-no-tvm
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-tvm-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-gpu-cmake-no-tvm
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1477,16 +1476,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-rtc-mkldnn
+    FLAVOR: gpu-cmake-no-rtc
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-rtc-gpu-cmake-no-rtc
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-mkldnn
+  name: compile-gpu-cmake-no-rtc
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-rtc-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-gpu-cmake-no-rtc
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1536,16 +1535,16 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp-mkldnn
+    FLAVOR: mkldnn-cpp
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp-mkldnn-cpp
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-mkldnn
+  name: compile-mkldnn-cpp
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-cpp-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile-mkldnn-cpp
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1555,6 +1554,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: af83f9817d9e995b134157d3660b2d16a9cc6411a7684af5ba3f5dc744fa2253
+hmac: f97b54bccf52c6a5b52ddf3775cf8a4f4432ac15d5091b5cce3e7edf90f0d699
 
 ...
