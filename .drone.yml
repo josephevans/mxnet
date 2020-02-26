@@ -40,10 +40,10 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: basic
-    FLAVOR_BUILD_DIR: /drone/src/sanity-basic
+    FLAVOR_BUILD_DIR: /drone/src/sanity
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: compile-basic
+  name: compile
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -53,18 +53,18 @@ steps:
   - cd python && pip install -e . && cd ..
   - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
   depends_on:
-  - compile-basic
+  - compile
   environment:
-    FLAVOR: basic
-    FLAVOR_BUILD_DIR: /drone/src/sanity-basic
+    FLAVOR_BUILD_DIR: /drone/src/sanity
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-basic-python
+  name: test-python
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/sanity-ccache --delete
     --no-progress --size-only --quiet || true
   depends_on:
-  - compile-basic
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -115,10 +115,10 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: compile-openblas
+  name: compile
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -127,12 +127,12 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
-  - compile-openblas
+  - compile
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-python3
+  name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -144,12 +144,12 @@ steps:
   - cd scala-package
   - mvn -B install -DskipTests=true
   depends_on:
-  - compile-openblas
+  - compile
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-scala-prep
+  name: test-scala-prep
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -161,12 +161,12 @@ steps:
   - cd scala-package
   - mvn -B verify -DskipTests=false
   depends_on:
-  - test-openblas-scala-prep
+  - test-scala-prep
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-scala
+  name: test-scala
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -181,12 +181,12 @@ steps:
   - lein test
   - lein cloverage --codecov
   depends_on:
-  - test-openblas-scala-prep
+  - test-scala-prep
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-clojure
+  name: test-clojure
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -201,12 +201,12 @@ steps:
     d | awk '!/dontselect1|cnn-text-classification|gan|neural-style|pre-trained-models|profiler/')
   - for i in $TEST_CASES; do cd $i && lein test && cd ..; done
   depends_on:
-  - test-openblas-scala-prep
+  - test-scala-prep
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-clojure-integration
+  name: test-clojure-integration
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -215,12 +215,12 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
-  - compile-openblas
+  - compile
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-perl
+  name: test-perl
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -231,12 +231,12 @@ steps:
   - apt-get -y install libcurl4-gnutls-dev
   - /work/runtime_functions.sh unittest_ubuntu_cpu_R
   depends_on:
-  - compile-openblas
+  - compile
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-r
+  name: test-r
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -245,12 +245,12 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpu_julia07
   depends_on:
-  - compile-openblas
+  - compile
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-julia-0.7
+  name: test-julia-0.7
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -259,12 +259,12 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_cpu_julia10
   depends_on:
-  - compile-openblas
+  - compile
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-julia-1.0
+  name: test-julia-1.0
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -273,18 +273,18 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
   depends_on:
-  - compile-openblas
+  - compile
   environment:
-    FLAVOR: openblas
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-openblas
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-onnx
+  name: test-onnx
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-openblas
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -339,10 +339,10 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: openblas-debug
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: compile-openblas-debug
+  name: compile
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -351,12 +351,12 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
-  - compile-openblas-debug
+  - compile
   environment:
-    FLAVOR: openblas-debug
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-debug-python3
+  name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -368,18 +368,18 @@ steps:
   - ldd build/tests/mxnet_unit_tests
   - build/tests/mxnet_unit_tests
   depends_on:
-  - compile-openblas-debug
+  - compile
   environment:
-    FLAVOR: openblas-debug
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug-openblas-debug
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-debug-cpp
+  name: test-cpp
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-debug-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-openblas-debug
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -431,10 +431,10 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkl
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: compile-mkl
+  name: compile
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -443,18 +443,18 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
-  - compile-mkl
+  - compile
   environment:
-    FLAVOR: mkl
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-mkl-python3
+  name: test-python3
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkl-ccache --delete
     --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkl
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -506,10 +506,10 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: compile-mkldnn
+  name: compile
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -518,12 +518,12 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
-  - compile-mkldnn
+  - compile
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-mkldnn-python3
+  name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -532,12 +532,12 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
   depends_on:
-  - compile-mkldnn
+  - compile
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-mkldnn-scala
+  name: test-scala
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -546,18 +546,18 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_minimal_R
   depends_on:
-  - compile-mkldnn
+  - compile
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-mkldnn-r
+  name: test-r
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -609,10 +609,10 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn-mkl
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl-mkldnn-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: compile-mkldnn-mkl
+  name: compile
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -621,81 +621,18 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
-  - compile-mkldnn-mkl
+  - compile
   environment:
-    FLAVOR: mkldnn-mkl
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl-mkldnn-mkl
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-mkldnn-mkl-python3
+  name: test-python3
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-mkldnn-mkl-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn-mkl
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: build-cleanup
-  when:
-    status:
-    - failure
-    - success
-type: docker
----
-clone:
-  disable: true
-depends_on:
-- sanity
-image_pull_secrets:
-- dockerconfigjson
-kind: pipeline
-name: unix-cpu-int64
-node:
-  hw: linuxcpu
-platform:
-  arch: amd64
-  os: linux
-steps:
-- commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-int64-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
-  - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: clone-src
-- commands:
-  - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
-  - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
-  - set
-  - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
-  - mkdir -p $FLAVOR_BUILD_DIR/build
-  - cd build
-  - cmake -DUSE_SIGNAL_HANDLER=ON -DUSE_CUDA=OFF -DUSE_CUDNN=OFF -DUSE_MKLDNN=OFF
-    -DCMAKE_BUILD_TYPE=Release -DUSE_INT64_TENSOR_SIZE=ON -G Ninja ..
-  - ninja -j8
-  - find / -name libmxnet.so
-  - ccache -s
-  - pwd && find . -name libmxnet.so
-  - find $FLAVOR_BUILD_DIR -name libmxnet.so
-  depends_on:
-  - clone-src
-  environment:
-    FLAVOR: int64
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64-int64
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: compile-int64
-- commands:
-  - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-int64-ccache
-    --delete --no-progress --size-only --quiet || true
-  depends_on:
-  - compile-int64
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -750,10 +687,10 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: openblas-no-tvm-op
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: compile-openblas-no-tvm-op
+  name: compile
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -762,140 +699,18 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
-  - compile-openblas-no-tvm-op
+  - compile
   environment:
-    FLAVOR: openblas-no-tvm-op
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
-  name: test-openblas-no-tvm-op-python3
+  name: test-python3
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-openblas-no-tvm-op-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-openblas-no-tvm-op
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: build-cleanup
-  when:
-    status:
-    - failure
-    - success
-type: docker
----
-clone:
-  disable: true
-depends_on:
-- sanity
-image_pull_secrets:
-- dockerconfigjson
-kind: pipeline
-name: unix-cpu-static-scala
-node:
-  hw: linuxcpu
-platform:
-  arch: amd64
-  os: linux
-steps:
-- commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-static-scala-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
-  - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: clone-src
-- commands:
-  - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
-  - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
-  - set
-  - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
-  - mkdir -p $FLAVOR_BUILD_DIR/build
-  - MAVEN_PUBLISH_OS_TYPE=linux-x86_64-cpu
-  - NUM_PROC=8 mxnet_variant=cpu ./ci/publish/scala/build.sh
-  - find / -name libmxnet.so
-  - ccache -s
-  - pwd && find . -name libmxnet.so
-  - find $FLAVOR_BUILD_DIR -name libmxnet.so
-  depends_on:
-  - clone-src
-  environment:
-    FLAVOR: static-scala
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-scala-static-scala
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
-  name: compile-static-scala
-- commands:
-  - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-static-scala-ccache
-    --delete --no-progress --size-only --quiet || true
-  depends_on:
-  - compile-static-scala
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: build-cleanup
-  when:
-    status:
-    - failure
-    - success
-type: docker
----
-clone:
-  disable: true
-depends_on:
-- sanity
-image_pull_secrets:
-- dockerconfigjson
-kind: pipeline
-name: unix-cpu-static-python
-node:
-  hw: linuxcpu
-platform:
-  arch: amd64
-  os: linux
-steps:
-- commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-cpu-static-python-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
-  - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: clone-src
-- commands:
-  - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
-  - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
-  - set
-  - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
-  - mkdir -p $FLAVOR_BUILD_DIR/build
-  - NUM_PROC=8 tools/staticbuild/build.sh cpu
-  - tools/staticbuild/build_wheel.sh
-  - find / -name libmxnet.so
-  - ccache -s
-  - pwd && find . -name libmxnet.so
-  - find $FLAVOR_BUILD_DIR -name libmxnet.so
-  depends_on:
-  - clone-src
-  environment:
-    FLAVOR: static-python
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python-static-python
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
-  name: compile-static-python
-- commands:
-  - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-cpu-static-python-ccache
-    --delete --no-progress --size-only --quiet || true
-  depends_on:
-  - compile-static-python
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -945,16 +760,30 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-mkldnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-mkldnn
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_python3_gpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-python3
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1004,16 +833,30 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn-no-cudnn
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn-mkldnn-no-cudnn
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-mkldnn-no-cudnn
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_nocudnn
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-python3
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-nocudnn-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn-no-cudnn
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1063,16 +906,128 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: gpu-full
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full-gpu-full
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-gpu-full
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-python3
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_python3_quantization_gpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-python3-quantize
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-perl
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_gpu_R
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-r
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_python
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-python3-integration
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_cpp_package
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-cpp-package
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_scala
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-scala
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_dist_kvstore
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-distributed-kvstore
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-full-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-gpu-full
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1122,16 +1077,30 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn-cmake
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn-mkldnn-cmake
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-mkldnn-cmake
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_cpp
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-cpp
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-mkldnn-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn-cmake
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1181,16 +1150,30 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: gpu-cmake
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-gpu-cmake
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-gpu-cmake
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_cpp
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-cpp
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-gpu-cmake
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1240,75 +1223,30 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: gpu-tensorrt
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt-gpu-tensorrt
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
-  name: compile-gpu-tensorrt
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_tensorrt_gpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
+  name: test-python3
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-tensorrt-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-gpu-tensorrt
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: build-cleanup
-  when:
-    status:
-    - failure
-    - success
-type: docker
----
-clone:
-  disable: true
-depends_on:
-- sanity
-image_pull_secrets:
-- dockerconfigjson
-kind: pipeline
-name: unix-gpu-int64
-node:
-  hw: linuxgpu
-platform:
-  arch: amd64
-  os: linux
-steps:
-- commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-int64-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
-  - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: clone-src
-- commands:
-  - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
-  - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
-  - set
-  - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
-  - mkdir -p $FLAVOR_BUILD_DIR/build
-  - /work/runtime_functions.sh build_ubuntu_gpu_large_tensor
-  - ccache -s
-  - pwd && find . -name libmxnet.so
-  - find $FLAVOR_BUILD_DIR -name libmxnet.so
-  depends_on:
-  - clone-src
-  environment:
-    FLAVOR: gpu-int64
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-int64-gpu-int64
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-gpu-int64
-- commands:
-  - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-int64-ccache
-    --delete --no-progress --size-only --quiet || true
-  depends_on:
-  - compile-gpu-int64
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1358,134 +1296,30 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: gpu-no-tvm
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm-gpu-no-tvm
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-gpu-no-tvm
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-python3
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-no-tvm-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-gpu-no-tvm
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: build-cleanup
-  when:
-    status:
-    - failure
-    - success
-type: docker
----
-clone:
-  disable: true
-depends_on:
-- sanity
-image_pull_secrets:
-- dockerconfigjson
-kind: pipeline
-name: unix-gpu-cmake-no-tvm
-node:
-  hw: linuxgpu
-platform:
-  arch: amd64
-  os: linux
-steps:
-- commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-tvm-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
-  - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: clone-src
-- commands:
-  - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
-  - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
-  - set
-  - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
-  - mkdir -p $FLAVOR_BUILD_DIR/build
-  - /work/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
-  - ccache -s
-  - pwd && find . -name libmxnet.so
-  - find $FLAVOR_BUILD_DIR -name libmxnet.so
-  depends_on:
-  - clone-src
-  environment:
-    FLAVOR: gpu-cmake-no-tvm
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-tvm-gpu-cmake-no-tvm
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-gpu-cmake-no-tvm
-- commands:
-  - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-tvm-ccache
-    --delete --no-progress --size-only --quiet || true
-  depends_on:
-  - compile-gpu-cmake-no-tvm
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: build-cleanup
-  when:
-    status:
-    - failure
-    - success
-type: docker
----
-clone:
-  disable: true
-depends_on:
-- sanity
-image_pull_secrets:
-- dockerconfigjson
-kind: pipeline
-name: unix-gpu-cmake-no-rtc
-node:
-  hw: linuxgpu
-platform:
-  arch: amd64
-  os: linux
-steps:
-- commands:
-  - mkdir -p src.orig && cd src.orig
-  - /usr/local/bin/clone-commit
-  - git submodule update --init --recursive
-  - cd ..
-  - aws s3 sync s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-rtc-ccache /drone/src/ccache
-    --no-progress --size-only --quiet || true
-  - /ci/setup_ccache.sh
-  - ls -liaF && du -hs *
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
-  name: clone-src
-- commands:
-  - . /ci/setup_build_env.sh
-  - cp -r src.orig $FLAVOR_BUILD_DIR
-  - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
-  - set
-  - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
-  - mkdir -p $FLAVOR_BUILD_DIR/build
-  - /work/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
-  - ccache -s
-  - pwd && find . -name libmxnet.so
-  - find $FLAVOR_BUILD_DIR -name libmxnet.so
-  depends_on:
-  - clone-src
-  environment:
-    FLAVOR: gpu-cmake-no-rtc
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-rtc-gpu-cmake-no-rtc
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
-  name: compile-gpu-cmake-no-rtc
-- commands:
-  - ls -liaF && du -hs *
-  - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-cmake-no-rtc-ccache
-    --delete --no-progress --size-only --quiet || true
-  depends_on:
-  - compile-gpu-cmake-no-rtc
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1535,16 +1369,30 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR: mkldnn-cpp
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp-mkldnn-cpp
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp
+    NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_build_cuda
-  name: compile-mkldnn-cpp
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
+  - pwd && ls -liaF && find . -name libmxnet.so
+  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_capi_cpp_package
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp
+    NUMPROC: 4
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_cu101
+  name: test-capi-cpp-package
 - commands:
   - ls -liaF && du -hs *
   - aws s3 sync /drone/src/ccache s3://mxnet-ci-drone-ccache/unix-gpu-mkldnn-cpp-ccache
     --delete --no-progress --size-only --quiet || true
   depends_on:
-  - compile-mkldnn-cpp
+  - compile
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: build-cleanup
   when:
@@ -1554,6 +1402,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: f97b54bccf52c6a5b52ddf3775cf8a4f4432ac15d5091b5cce3e7edf90f0d699
+hmac: da79103e6b8554c3f955f6ec44dd4ae1341b2deb3b01d1c771cb63e65c82e658
 
 ...
