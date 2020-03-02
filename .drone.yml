@@ -346,7 +346,7 @@ steps:
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - build/tests/mxnet_unit_tests
+  - /ci/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
   environment:
@@ -1392,7 +1392,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1407,7 +1407,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
   name: test-python3
 - commands:
   - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
@@ -1841,6 +1841,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: 7fb2e92c5bc4da8b1ff42ba552b7ed7c2ba36bb9d5811fead609e9e963f5fcc1
+hmac: f2d8492ae7a399247721fdef71b85b96fa8ea0ef9b8e795bf17658bbd2b3b6a7
 
 ...
