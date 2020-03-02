@@ -23,7 +23,6 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
@@ -35,7 +34,7 @@ steps:
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/sanity
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
@@ -43,7 +42,6 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
@@ -53,7 +51,7 @@ steps:
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/sanity
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python
@@ -69,6 +67,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -96,18 +97,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_cpu_openblas
+  - /ci/runtime_functions.sh build_ubuntu_cpu_openblas
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
@@ -115,17 +115,16 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - pip install -r tests/requirements.txt
   - pip install -e python
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
@@ -133,7 +132,6 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
@@ -144,7 +142,7 @@ steps:
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-scala-prep
@@ -152,7 +150,6 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
@@ -163,7 +160,7 @@ steps:
   depends_on:
   - test-scala-prep
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-scala
@@ -171,15 +168,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_clojure
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_clojure
   depends_on:
   - test-scala-prep
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-clojure
@@ -187,15 +183,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_clojure_integration
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_clojure_integration
   depends_on:
   - test-scala-prep
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-clojure-integration
@@ -203,15 +198,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
+  - /ci/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-perl
@@ -219,17 +213,16 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - apt-get update
   - apt-get -y install libcurl4-gnutls-dev
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_R
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_R
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-r
@@ -237,15 +230,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_julia07
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_julia07
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-julia-0.7
@@ -253,15 +245,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_cpu_julia10
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_julia10
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-julia-1.0
@@ -269,15 +260,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
+  - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-onnx
@@ -293,6 +283,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -320,18 +313,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_cpu_cmake_debug
+  - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_debug
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -339,15 +331,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
@@ -355,7 +346,6 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
@@ -363,7 +353,7 @@ steps:
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
@@ -379,6 +369,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -406,18 +399,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_cpu_mkl
+  - /ci/runtime_functions.sh build_ubuntu_cpu_mkl
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
@@ -425,15 +417,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkl
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
@@ -449,6 +440,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -476,18 +470,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_cpu_mkldnn
+  - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
@@ -495,15 +488,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
@@ -511,15 +503,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh integrationtest_ubuntu_cpu_scala
+  - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_scala
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-scala
@@ -527,15 +518,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_minimal_R
+  - /ci/runtime_functions.sh unittest_ubuntu_minimal_R
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-r
@@ -551,6 +541,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -578,18 +571,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_cpu_mkldnn_mkl
+  - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn_mkl
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
@@ -597,15 +589,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-mkldnn-mkl
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
@@ -621,6 +612,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -648,18 +642,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_cpu_large_tensor
+  - /ci/runtime_functions.sh build_ubuntu_cpu_large_tensor
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-int64
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
@@ -675,6 +668,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -702,18 +698,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_cpu_cmake_no_tvm_op
+  - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_no_tvm_op
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
@@ -721,15 +716,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_cpu
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-no-tvm-op
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
@@ -745,6 +739,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -772,18 +769,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_static_scala_cpu
+  - /ci/runtime_functions.sh build_static_scala_cpu
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-scala
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
@@ -799,6 +795,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -826,18 +825,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_static_python_cpu
+  - /ci/runtime_functions.sh build_static_python_cpu
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
@@ -853,6 +851,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -880,18 +881,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_static_python_cpu_cmake
+  - /ci/runtime_functions.sh build_static_python_cpu_cmake
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-cpu-static-python-cmake
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
@@ -907,6 +907,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -934,18 +937,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_mkldnn
+  - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -953,15 +955,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_gpu
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
@@ -977,6 +978,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1004,18 +1008,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_mkldnn_nocudnn
+  - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn_nocudnn
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1023,15 +1026,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_nocudnn
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_nocudnn
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-nocudnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
@@ -1047,6 +1049,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1074,18 +1079,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1093,15 +1097,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
@@ -1109,15 +1112,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_quantization_gpu
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_quantization_gpu
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3-quantize
@@ -1125,15 +1127,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_cpugpu_perl
+  - /ci/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-perl
@@ -1141,15 +1142,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_gpu_R
+  - /ci/runtime_functions.sh unittest_ubuntu_gpu_R
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-r
@@ -1157,15 +1157,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_python
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_python
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3-integration
@@ -1173,15 +1172,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_cpp_package
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_cpp_package
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp-package
@@ -1189,15 +1187,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_scala
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_scala
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-scala
@@ -1205,15 +1202,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_dist_kvstore
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_dist_kvstore
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-full
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-distributed-kvstore
@@ -1229,6 +1225,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1256,18 +1255,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_cmake_mkldnn
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_mkldnn
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1275,15 +1273,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_cpp
+  - /ci/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-mkldnn
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
@@ -1299,6 +1296,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1326,18 +1326,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_cmake
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cmake
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1345,15 +1344,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_cpp
+  - /ci/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
@@ -1369,6 +1367,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1396,18 +1397,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_tensorrt
+  - /ci/runtime_functions.sh build_ubuntu_gpu_tensorrt
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1415,15 +1415,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_tensorrt_gpu
+  - /ci/runtime_functions.sh unittest_ubuntu_tensorrt_gpu
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-tensorrt
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
@@ -1439,6 +1438,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1466,18 +1468,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_large_tensor
+  - /ci/runtime_functions.sh build_ubuntu_gpu_large_tensor
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-int64
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1493,6 +1494,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1520,18 +1524,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_no_tvm_op
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_no_tvm_op
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1539,15 +1542,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-no-tvm
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
@@ -1563,6 +1565,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1590,18 +1595,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-tvm
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1617,6 +1621,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1644,18 +1651,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-cmake-no-rtc
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1671,6 +1677,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1698,18 +1707,17 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_mkldnn_cpp_test
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_mkldnn_cpp_test
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
@@ -1717,15 +1725,14 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - pwd && ls -liaF && find . -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh integrationtest_ubuntu_gpu_capi_cpp_package
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_capi_cpp_package
   depends_on:
   - compile
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-mkldnn-cpp
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-capi-cpp-package
@@ -1741,6 +1748,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1768,20 +1778,19 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_static_python_cu101
+  - /ci/runtime_functions.sh build_static_python_cu101
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-static-python
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
   name: compile
 - commands:
   - ls -liaF && du -hs *
@@ -1795,6 +1804,9 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 clone:
   disable: true
@@ -1822,20 +1834,19 @@ steps:
   - ls -liaF
   - set
   - ccache --zero-stats
-  - rm -rf /work/mxnet && ln -sf $FLAVOR_BUILD_DIR /work/mxnet
   - mkdir -p $FLAVOR_BUILD_DIR/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /work/runtime_functions.sh build_static_python_cu101_cmake
+  - /ci/runtime_functions.sh build_static_python_cu101_cmake
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
   depends_on:
   - clone-src
   environment:
-    FLAVOR_BUILD_DIR: /drone/src/unix-gpu-static-python-cmake
+    FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
   name: compile
 - commands:
   - ls -liaF && du -hs *
@@ -1849,8 +1860,11 @@ steps:
     - failure
     - success
 type: docker
+workspace:
+  base: /work
+  path: mxnet
 ---
 kind: signature
-hmac: b91840b8a14940c0cde92b0eedcc8c98a2334d47c0d7163fda669f91f86fb71d
+hmac: bebce5898e1bedea6478e7cd078f653ad02b1e653440043f39b0a4617ed59c56
 
 ...
