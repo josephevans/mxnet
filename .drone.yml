@@ -109,7 +109,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -127,7 +127,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -146,7 +146,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-scala-prep
 - commands:
   - . /ci/setup_test_env.sh
@@ -165,7 +165,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-scala
 - commands:
   - . /ci/setup_test_env.sh
@@ -181,7 +181,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-clojure
 - commands:
   - . /ci/setup_test_env.sh
@@ -197,7 +197,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-clojure-integration
 - commands:
   - . /ci/setup_test_env.sh
@@ -213,7 +213,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-perl
 - commands:
   - . /ci/setup_test_env.sh
@@ -231,7 +231,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-r
 - commands:
   - . /ci/setup_test_env.sh
@@ -247,7 +247,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-julia-0.7
 - commands:
   - . /ci/setup_test_env.sh
@@ -263,7 +263,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-julia-1.0
 - commands:
   - . /ci/setup_test_env.sh
@@ -279,7 +279,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-onnx
 - commands:
   - ls -liaF && du -hs *
@@ -333,7 +333,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -349,7 +349,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -365,7 +365,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/unix-cpu-openblas-debug
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
 - commands:
   - ls -liaF && du -hs *
@@ -1851,6 +1851,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: aac6bc45d6f4ee430c418b354be96b9b4e2e26ceab230642a8660a2e180202f2
+hmac: 6044f9c0336aac9cf3ae09e953d699d87951d363e568eaa80dd3d1bb27c58d98
 
 ...
