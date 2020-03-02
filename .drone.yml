@@ -14,16 +14,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
@@ -56,7 +55,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -88,16 +87,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_openblas
@@ -272,7 +270,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-onnx
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -304,16 +302,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_debug
@@ -358,7 +355,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -390,16 +387,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_mkl
@@ -429,7 +425,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -461,16 +457,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn
@@ -530,7 +525,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-r
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -562,16 +557,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn_mkl
@@ -601,7 +595,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -633,16 +627,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_large_tensor
@@ -657,7 +650,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -689,16 +682,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_no_tvm_op
@@ -728,7 +720,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -760,16 +752,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_scala_cpu
@@ -784,7 +775,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -816,16 +807,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_python_cpu
@@ -840,7 +830,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -872,16 +862,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_python_cpu_cmake
@@ -896,7 +885,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -928,16 +917,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn
@@ -967,7 +955,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -999,16 +987,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn_nocudnn
@@ -1038,7 +1025,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1070,16 +1057,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7
@@ -1214,7 +1200,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-distributed-kvstore
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1246,16 +1232,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_mkldnn
@@ -1285,7 +1270,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1317,16 +1302,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cmake
@@ -1356,7 +1340,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1388,16 +1372,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_tensorrt
@@ -1427,7 +1410,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1459,16 +1442,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_large_tensor
@@ -1483,7 +1465,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1515,16 +1497,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_no_tvm_op
@@ -1554,7 +1535,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1586,16 +1567,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
@@ -1610,7 +1590,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1642,16 +1622,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
@@ -1666,7 +1645,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1698,16 +1677,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_mkldnn_cpp_test
@@ -1737,7 +1715,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-capi-cpp-package
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1769,16 +1747,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_python_cu101
@@ -1793,7 +1770,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1825,16 +1802,15 @@ steps:
 - commands:
   - /ci/get_source.sh
   - /ci/setup_ccache.sh
-  - du -hs *
+  - du -hs $DRONE_WORKSPACE_BASE/*
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
   name: clone-src
 - commands:
   - . /ci/setup_build_env.sh
   - cd $FLAVOR_BUILD_DIR
-  - ls -liaF
   - set
   - ccache --zero-stats
-  - mkdir -p $FLAVOR_BUILD_DIR/build
+  - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_python_cu101_cmake
@@ -1849,7 +1825,7 @@ steps:
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
   name: compile
 - commands:
-  - ls -liaF && du -hs *
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
   - /ci/cleanup_ccache.sh
   depends_on:
   - compile
@@ -1865,6 +1841,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: bebce5898e1bedea6478e7cd078f653ad02b1e653440043f39b0a4617ed59c56
+hmac: 573f1b9cf670d64538da56fa228e542327074f3f3397b3b9e168694367a37680
 
 ...
