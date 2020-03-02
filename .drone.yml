@@ -1222,7 +1222,7 @@ depends_on:
 image_pull_secrets:
 - dockerconfigjson
 kind: pipeline
-name: unix-gpu-cmake-mkldnn
+name: unix-gpu-full-make
 node:
   hw: linuxgpu
 platform:
@@ -1243,7 +1243,7 @@ steps:
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - find / -name libcuda.so.1
-  - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_mkldnn
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_make
   - ccache -s
   - pwd && find . -name libmxnet.so
   - find $FLAVOR_BUILD_DIR -name libmxnet.so
@@ -1841,6 +1841,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: 573f1b9cf670d64538da56fa228e542327074f3f3397b3b9e168694367a37680
+hmac: 7fb2e92c5bc4da8b1ff42ba552b7ed7c2ba36bb9d5811fead609e9e963f5fcc1
 
 ...
