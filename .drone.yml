@@ -37,7 +37,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/sanity
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -55,7 +55,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/src/sanity
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python
 - commands:
   - ls -liaF && du -hs *
@@ -1851,6 +1851,6 @@ steps:
 type: docker
 ---
 kind: signature
-hmac: 6044f9c0336aac9cf3ae09e953d699d87951d363e568eaa80dd3d1bb27c58d98
+hmac: b91840b8a14940c0cde92b0eedcc8c98a2334d47c0d7163fda669f91f86fb71d
 
 ...
