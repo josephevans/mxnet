@@ -294,7 +294,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -307,20 +307,21 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - cd $DRONE_WORKSPACE_BASE
   - /ci/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /work/mxnet
     NUMPROC: 4
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-cpp
 - commands:
   - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
@@ -1725,6 +1726,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: 11f916da9c0c75332db8de5eb5a412ade92d384083d49cdc6774c76d2d559ef7
+hmac: ff1a91371646c38892dd9a3b2362bbc8acf775e339634f6eec39ed43ca117f03
 
 ...
