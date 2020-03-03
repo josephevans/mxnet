@@ -24,7 +24,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
     USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j8
   - ccache -s
@@ -40,9 +39,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - pip install -e python
   - pip install -r tests/requirements.txt
   - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
@@ -96,7 +93,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_openblas
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -111,9 +107,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - pip install -r tests/requirements.txt
   - pip install -e python
   - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
@@ -128,9 +122,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
     /root/.m2
   - cd scala-package
@@ -146,9 +138,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - mkdir -p $FLAVOR_BUILD_DIR/.m2 && rm -rf /root/.m2 && ln -sf $FLAVOR_BUILD_DIR/.m2
     /root/.m2
   - cd scala-package
@@ -164,9 +154,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_cpu_clojure
   depends_on:
   - test-scala-prep
@@ -179,9 +167,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_cpu_clojure_integration
   depends_on:
   - test-scala-prep
@@ -194,9 +180,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
   - compile
@@ -209,9 +193,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - apt-get update
   - apt-get -y install libcurl4-gnutls-dev
   - /ci/runtime_functions.sh unittest_ubuntu_cpu_R
@@ -226,9 +208,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_cpu_julia07
   depends_on:
   - compile
@@ -241,9 +221,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_cpu_julia10
   depends_on:
   - compile
@@ -256,9 +234,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
   depends_on:
   - compile
@@ -310,7 +286,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_debug
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -325,9 +300,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
@@ -340,9 +313,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
@@ -394,7 +365,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_mkl
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -409,9 +379,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
@@ -463,7 +431,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -478,9 +445,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile
@@ -493,9 +458,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_scala
   depends_on:
   - compile
@@ -508,9 +471,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_minimal_R
   depends_on:
   - compile
@@ -562,7 +523,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn_mkl
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -577,9 +537,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
   depends_on:
   - compile
@@ -631,7 +589,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_large_tensor
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -685,7 +642,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_no_tvm_op
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -700,9 +656,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
   depends_on:
   - compile
@@ -754,7 +708,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_scala_cpu
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -808,7 +761,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_python_cpu
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -862,7 +814,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_python_cpu_cmake
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -916,7 +867,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -931,9 +881,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu
   depends_on:
   - compile
@@ -985,7 +933,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn_nocudnn
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1000,9 +947,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_nocudnn
   depends_on:
   - compile
@@ -1054,7 +999,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1069,9 +1013,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
   depends_on:
   - compile
@@ -1084,9 +1026,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_quantization_gpu
   depends_on:
   - compile
@@ -1099,9 +1039,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_cpugpu_perl
   depends_on:
   - compile
@@ -1114,9 +1052,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_gpu_R
   depends_on:
   - compile
@@ -1129,9 +1065,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_python
   depends_on:
   - compile
@@ -1144,9 +1078,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_cpp_package
   depends_on:
   - compile
@@ -1159,9 +1091,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_scala
   depends_on:
   - compile
@@ -1174,9 +1104,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_dist_kvstore
   depends_on:
   - compile
@@ -1228,7 +1156,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_make
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1243,9 +1170,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
@@ -1297,7 +1222,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cmake
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1312,9 +1236,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_cpp
   depends_on:
   - compile
@@ -1366,7 +1288,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_tensorrt
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1381,9 +1302,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_tensorrt_gpu
   depends_on:
   - compile
@@ -1435,7 +1354,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_large_tensor
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1489,7 +1407,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_no_tvm_op
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1504,9 +1421,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
   depends_on:
   - compile
@@ -1558,7 +1473,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1612,7 +1526,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1666,7 +1579,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_mkldnn_cpp_test
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1681,9 +1593,7 @@ steps:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
   - set
-  - pwd && ls -liaF && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_capi_cpp_package
   depends_on:
   - compile
@@ -1735,7 +1645,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_python_cu101
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1789,7 +1698,6 @@ steps:
   - ccache --zero-stats
   - mkdir -p $DRONE_WORKSPACE_BASE/build
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
-  - find / -name libcuda.so.1
   - /ci/runtime_functions.sh build_static_python_cu101_cmake
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE . -name libmxnet.so
@@ -1817,6 +1725,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: 9f1ec1421c034400a7dc3952f71bcf6f93d4e509b73ff3064c5895366b920d10
+hmac: 11f916da9c0c75332db8de5eb5a412ade92d384083d49cdc6774c76d2d559ef7
 
 ...
