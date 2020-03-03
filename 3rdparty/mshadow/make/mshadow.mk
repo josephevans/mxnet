@@ -8,7 +8,7 @@
 #  Add MSHADOW_NVCCFLAGS to the nvcc compile flags
 #----------------------------------------------------------------------------------------
 
-MSHADOW_CFLAGS = -funroll-loops -Wno-unused-parameter -Wno-unknown-pragmas -Wno-unused-local-typedefs
+MSHADOW_CFLAGS = -funroll-loops -Wno-unused-parameter -Wno-unknown-pragmas -Wno-unused-local-typedefs -Wno-error=maybe-uninitialized
 MSHADOW_LDFLAGS = -lm
 MSHADOW_NVCCFLAGS =
 
