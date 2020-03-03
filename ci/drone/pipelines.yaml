@@ -1,0 +1,442 @@
+pipelines:
+  sanity:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    compile:
+    - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1 USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j16
+    tests:
+      python:
+        commands:
+        - pip install -e python
+        - pip install -r tests/requirements.txt
+        - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
+
+
+  #####################
+  # Unix CPU Pipeline #
+  #####################
+  unix-cpu-openblas-cmake:
+    arch: amd64
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: cpu mx_lib_cython
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_openblas
+    tests:
+      python3:
+        commands:
+        - pip3 install -r $DRONE_WORKSPACE/ci/docker/install/requirements
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
+      julia-0.7:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_cpu_julia07
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-julia
+      julia-1.0:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_cpu_julia10
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-julia
+        depends-on: julia-0.7
+      r:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_cpu_R
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-r
+  unix-cpu-openblas-make:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: cpu_make mx_lib_make
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_openblas_make
+    tests:
+      onnx:
+        commands:
+        - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
+      scala:
+        commands:
+        - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_scala
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-scala
+      clojure:
+        commands:
+        - cd $DRONE_WORKSPACE/contrib/clojure-package
+        - MXNET_HOME="" scripts/get_mnist_data.sh
+        - MXNET_HOME="" scripts/get_cifar_data.sh
+        - MXNET_HOME="" scripts/get_test_images.sh
+        - MXNET_HOME="" scripts/infer/get_resnet_18_data.sh
+        - MXNET_HOME="" scripts/infer/get_ssd_data.sh
+        - cd $DRONE_WORKSPACE
+        - /ci/runtime_functions.sh unittest_ubuntu_cpu_clojure
+        depends-on: scala
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-clojure
+      clojure-integration:
+        commands:
+        - cd $DRONE_WORKSPACE/contrib/clojure-package
+        - MXNET_HOME="" scripts/get_mnist_data.sh
+        - MXNET_HOME="" scripts/get_cifar_data.sh
+        - MXNET_HOME="" scripts/get_test_images.sh
+        - MXNET_HOME="" scripts/infer/get_resnet_18_data.sh
+        - MXNET_HOME="" scripts/infer/get_ssd_data.sh
+        - cd $DRONE_WORKSPACE
+        - /ci/runtime_functions.sh unittest_ubuntu_cpu_clojure_integration
+        depends-on: clojure
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-clojure
+      perl:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_cpugpu_perl
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-perl
+  unix-cpu-openblas-debug:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: cpu_debug mx_cmake_lib_debug
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_debug
+    tests:
+      python3:
+        commands:
+        #- pip3 install -r $DRONE_WORKSPACE/ci/docker/install/requirements
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
+      cpp:
+        commands:
+        - /ci/runtime_functions.sh unittest_cpp
+  unix-cpu-mkl:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: cpu_mkl mx_lib
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_mkl
+    tests:
+      python3:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
+  unix-cpu-mkldnn-cmake:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: mkldnn_cpu mx_mkldnn_lib
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn
+    tests:
+      python3:
+        commands:
+        #- pip3 install -r $DRONE_WORKSPACE/ci/docker/install/requirements
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
+      r:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_minimal_R
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-r
+  unix-cpu-mkldnn-make:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: mkldnn_cpu_make mx_mkldnn_lib_make
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn_make
+    tests:
+      scala:
+        commands:
+        - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_scala
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu-scala
+  unix-cpu-mkldnn-mkl:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: mkldnn_mkl_cpu mx_mkldnn_lib
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn_mkl
+    tests:
+      python3:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
+  unix-cpu-int64:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: ubuntu_cpu_int64 mx_cmake_lib
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_large_tensor
+  unix-cpu-openblas-no-tvm-op:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    stash-libs: cpu_openblas_no_tvm_op mx_cmake_lib_no_tvm_op
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_no_tvm_op
+    tests:
+      python3:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
+  unix-cpu-static-scala:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    compile:
+    - /ci/runtime_functions.sh build_static_scala_cpu
+  unix-cpu-static-python:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    compile:
+    - /ci/runtime_functions.sh build_static_python_cpu
+  unix-cpu-static-python-cmake:
+    arch: amd64
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
+    instance-type: linuxcpu
+    os: linux
+    depends-on:
+    - sanity
+    compile:
+    - /ci/runtime_functions.sh build_static_python_cpu_cmake
+
+
+
+
+  #####################
+  # Unix GPU Pipeline #
+  #####################
+  unix-gpu-mkldnn:
+    arch: amd64
+    os: linux
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: mkldnn_gpu mx_mkldnn_lib
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn
+    tests:
+      python3:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu
+  unix-gpu-mkldnn-nocudnn:
+    arch: amd64
+    os: linux
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: mkldnn_gpu_nocudnn mx_mkldnn_lib
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn_nocudnn
+    tests:
+      python3:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_nocudnn
+  unix-gpu-full:
+    arch: amd64
+    os: linux
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: gpu mx_lib_cpp_examples
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7
+    tests:
+      python3:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
+      python3-integration:
+        commands:
+        - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_python
+        depends-on: python3
+      python3-quantize:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_quantization_gpu
+        depends-on: python3
+      r:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_gpu_R
+        #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu-r
+      distributed-kvstore:
+        commands:
+        - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_dist_kvstore
+      # TODO caffe (?)
+  unix-gpu-full-make:
+    arch: amd64
+    os: linux
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: gpu_make mx_lib_cpp_examples_make
+    compile:
+    # TODO setup ccache
+    - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_make
+    tests:
+      cpp:
+        commands:
+        - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_cpp_package
+      perl:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_cpugpu_perl
+      scala:
+        commands:
+        - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_scala
+        depends-on: cpp
+  unix-gpu-cmake:
+    arch: amd64
+    os: linux
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: cmake_gpu mx_cmake_lib_cython
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_cmake
+    tests:
+      cpp:
+        commands:
+        - /ci/runtime_functions.sh unittest_cpp
+  unix-gpu-tensorrt:
+    arch: amd64
+    os: linux
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu-tensorrt
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: tensorrt mx_tensorrt_lib
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_tensorrt
+    tests:
+      python3:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_tensorrt_gpu
+  unix-gpu-int64:
+    arch: amd64
+    os: linux
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: ubuntu_gpu_int64 mx_cmake_lib
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_large_tensor
+    tests:
+  unix-gpu-no-tvm:
+    arch: amd64
+    os: linux
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: gpu_no_tvm_op mx_lib_cpp_examples_no_tvm_op
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_no_tvm_op
+    tests:
+      python3:
+        commands:
+        - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
+  unix-gpu-cmake-no-tvm:
+    arch: amd64
+    os: linux
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
+    tests:
+  unix-gpu-cmake-no-rtc:
+    arch: amd64
+    os: linux
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
+    tests:
+  unix-gpu-mkldnn-cpp:
+    arch: amd64
+    os: linux
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    stash-libs: gpu_mkldnn_cpp_test_make mx_lib_cpp_capi_make
+    compile:
+    - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_mkldnn_cpp_test
+    tests:
+      capi-cpp-package:
+        commands:
+        - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_capi_cpp_package
+  unix-gpu-static-python:
+    arch: amd64
+    os: linux
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    compile:
+    # TODO setup ccache
+    - /ci/runtime_functions.sh build_static_python_cu101
+  unix-gpu-static-python-cmake:
+    arch: amd64
+    os: linux
+    image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
+    #image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
+    instance-type: linuxgpu
+    depends-on:
+    - sanity
+    compile:
+    # TODO setup ccache
+    - /ci/runtime_functions.sh build_static_python_cu101_cmake
+

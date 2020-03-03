@@ -1,0 +1,16 @@
+coverage
+cpplint
+Cython
+decorator
+graphviz<0.9.0,>=0.8.1
+ipython
+mock
+nose
+nose-timer
+onnx
+pylint
+pytest
+requests<3,>=2.20.0
+scipy
+setuptools
+six

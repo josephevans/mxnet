@@ -1,0 +1,87 @@
+#FROM nvidia/cuda:10.1-devel-ubuntu18.04
+FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    wget \
+    libssl-dev \
+    curl \
+    libcurl4-openssl-dev \
+    zlib1g-dev \
+    libtinfo-dev \
+    git \
+    libxml2-dev \
+    python3 python3-pip python3-dev \
+    unzip \
+    ninja-build \
+    gcc-6 g++-6 \
+    && rm -rf /var/lib/apt/lists/*
+
+# install cmake
+RUN cd /tmp && wget -q https://github.com/Kitware/CMake/releases/download/v3.16.4/cmake-3.16.4.tar.gz && \
+    tar xzf cmake-3.16.4.tar.gz && \
+    cd cmake-3.16.4 && ./configure --prefix=/usr/local && \
+    make -j $(nproc) && make install && \
+    cd .. && rm -rf cmake-3.16.4.tar.gz cmake-3.16.4
+
+RUN apt-get update && apt-get install -y \
+    libopenblas-dev \
+    libprotobuf-dev protobuf-compiler \
+    liblapack-dev liblapacke-dev \
+    libzmq3-dev \
+    libturbojpeg libturbojpeg0-dev \
+    libatlas-base-dev \
+    libgfortran3 \
+    gfortran \
+    libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+    libgtk-3-dev \
+    libavcodec-dev libavformat-dev \
+    libswscale-dev \
+    libv4l-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    openexr \
+    libtbb2 libtbb-dev \
+    libdc1394-22-dev \
+    libomp-dev \
+    libavresample-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# TODO remove symlink
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN ln -s /usr/bin/pip3 /usr/bin/pip
+
+# install required python modules for opencv
+RUN pip3 install numpy
+
+# install opencv 4
+RUN cd /tmp && wget -q https://github.com/opencv/opencv/archive/4.2.0.zip && \
+    unzip 4.2.0.zip && \
+    cd opencv-4.2.0 && \
+    mkdir build && cd build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_PERF_TESTS=OFF -D BUILD_TESTS=OFF -D OPENCV_GENERATE_PKGCONFIG=ON .. && \
+    make -j $(nproc) && make install && \
+    cd ../.. && rm -rf opencv-4.2.0 4.2.0.zip
+
+# install intel mkl
+RUN cd /tmp && curl -L https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB | apt-key add - && \
+    sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources.list.d/intel-mkl.list' && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        intel-mkl-2020.0-088 \
+    && rm -rf /var/lib/apt/lists/*
+
+# install ccache
+RUN cd /tmp && wget -q https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz && \
+    tar xzf ccache-3.7.7.tar.gz && \
+    cd ccache-3.7.7 && ./configure --prefix=/usr/local && \
+    make -j $(nproc) && make install && \
+    cd .. && rm -rf ccache-3.7.7.tar.gz ccache-3.7.7
+
+# install required python packages
+COPY build/requirements.txt /tmp/
+RUN pip3 install -r /tmp/requirements.txt && rm -f /tmp/requirements.txt
+
+

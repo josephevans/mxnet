@@ -1,0 +1,4 @@
+FROM mxnetci/ubuntu1804:cpu-base
+
+COPY install-ci/* /ci/
+

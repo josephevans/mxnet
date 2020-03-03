@@ -1,0 +1,12 @@
+FROM mxnetci/ubuntu1804:cpu-java
+
+RUN cd /tmp && wget -q https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein \
+    && mkdir -p /usr/local/bin \
+    && mv lein /usr/local/bin/ \
+    && chmod 0775 /usr/local/bin/lein \
+    && echo "Y" | /usr/local/bin/lein downgrade 2.8.3
+
+
+
+
+COPY install-ci/* /ci/

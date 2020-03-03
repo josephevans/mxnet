@@ -1,0 +1,13 @@
+FROM mxnetci/ubuntu1804:gpu-base
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    openjdk-8-jdk \
+    openjdk-8-jre \
+    maven \
+    && rm -rf /var/lib/apt/lists/*
+
+
+
+
+COPY install-ci/* /ci/

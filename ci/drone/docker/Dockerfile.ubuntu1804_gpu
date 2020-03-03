@@ -1,0 +1,4 @@
+FROM mxnetci/ubuntu1804:gpu-base
+
+COPY install-ci/* /ci/
+
