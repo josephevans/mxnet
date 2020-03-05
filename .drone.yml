@@ -94,7 +94,6 @@ steps:
   - ccache --zero-stats
   - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
   - /ci/runtime_functions.sh build_ubuntu_cpu_openblas
-  - ln -s $DRONE_WORKSPACE/build $DRONE_WORKSPACE/lib
   - ccache -s
   - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
   depends_on:
@@ -1726,6 +1725,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: 1faa503b7d30fd428dd615046c3f4a53ca37e700b8771f7268e15fc732b817f9
+hmac: 288131cfe191d30c9d2cc19f18f6e9ab178d6569e2cfeaddb5f1f94750540323
 
 ...
