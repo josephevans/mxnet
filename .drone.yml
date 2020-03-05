@@ -32,7 +32,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
@@ -47,7 +47,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python
 - commands:
@@ -73,7 +73,7 @@ depends_on:
 image_pull_secrets:
 - dockerconfigjson
 kind: pipeline
-name: unix-cpu-openblas
+name: unix-cpu-openblas-cmake
 node:
   hw: linuxcpu
 platform:
@@ -100,7 +100,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
@@ -113,7 +113,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
@@ -129,7 +129,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-scala-prep
 - commands:
@@ -145,7 +145,7 @@ steps:
   - test-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-scala
 - commands:
@@ -158,7 +158,7 @@ steps:
   - test-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-clojure
 - commands:
@@ -171,7 +171,7 @@ steps:
   - test-scala-prep
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-clojure-integration
 - commands:
@@ -184,7 +184,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-perl
 - commands:
@@ -199,7 +199,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-r
 - commands:
@@ -212,7 +212,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-julia-0.7
 - commands:
@@ -225,9 +225,62 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-julia-1.0
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/*
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-openblas-make
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh compile_unix_cpu_openblas_make
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 12
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
+  name: compile
 - commands:
   - . /ci/setup_test_env.sh
   - cd $FLAVOR_BUILD_DIR
@@ -240,7 +293,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-onnx
 - commands:
@@ -293,7 +346,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
@@ -306,7 +359,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
@@ -319,7 +372,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-cpp
 - commands:
@@ -372,7 +425,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
@@ -385,7 +438,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
@@ -438,7 +491,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
@@ -451,7 +504,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
@@ -464,7 +517,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-scala
 - commands:
@@ -477,7 +530,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-r
 - commands:
@@ -530,7 +583,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
@@ -543,7 +596,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
@@ -596,7 +649,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
@@ -649,7 +702,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: compile
 - commands:
@@ -662,7 +715,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_cpu
   name: test-python3
 - commands:
@@ -715,7 +768,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
 - commands:
@@ -768,7 +821,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
 - commands:
@@ -821,7 +874,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
   name: compile
 - commands:
@@ -874,7 +927,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -887,7 +940,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
@@ -940,7 +993,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -953,7 +1006,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
@@ -1006,7 +1059,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -1019,7 +1072,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
@@ -1032,7 +1085,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3-quantize
 - commands:
@@ -1045,7 +1098,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-perl
 - commands:
@@ -1058,7 +1111,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-r
 - commands:
@@ -1071,7 +1124,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3-integration
 - commands:
@@ -1084,7 +1137,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp-package
 - commands:
@@ -1097,7 +1150,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-scala
 - commands:
@@ -1110,7 +1163,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-distributed-kvstore
 - commands:
@@ -1163,7 +1216,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -1176,7 +1229,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
 - commands:
@@ -1229,7 +1282,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -1242,7 +1295,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-cpp
 - commands:
@@ -1295,7 +1348,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
   name: compile
 - commands:
@@ -1308,7 +1361,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu_gpu_tensorrt
   name: test-python3
 - commands:
@@ -1361,7 +1414,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -1414,7 +1467,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -1427,7 +1480,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-python3
 - commands:
@@ -1480,7 +1533,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -1533,7 +1586,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -1586,7 +1639,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: compile
 - commands:
@@ -1599,7 +1652,7 @@ steps:
   - compile
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1804_base
   name: test-capi-cpp-package
 - commands:
@@ -1652,7 +1705,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
   name: compile
 - commands:
@@ -1705,7 +1758,7 @@ steps:
   - clone-src
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
-    NUMPROC: 4
+    NUMPROC: 12
   image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
   name: compile
 - commands:
@@ -1725,6 +1778,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: 288131cfe191d30c9d2cc19f18f6e9ab178d6569e2cfeaddb5f1f94750540323
+hmac: 0bc4c6ac5b97b5424cccbb5c9608abbb00e0f626342b3b16ab6d4ba48706c7b7
 
 ...
