@@ -1,0 +1,1819 @@
+---
+clone:
+  disable: true
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: sanity
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - make DEV=1 USE_TVM_OP=1 USE_CPP_PACKAGE=1 USE_BLAS=openblas USE_MKLDNN=0 USE_DIST_KVSTORE=1
+    USE_LIBJPEG_TURBO=1 USE_SIGNAL_HANDLER=1 -j16
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - pip install -e python
+  - pip install -r tests/requirements.txt
+  - MXNET_TEST_COUNT=1 nosetests --nocapture tests/python/unittest/test_operator.py:test_norm
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-python
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-openblas-cmake
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_openblas
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - pip3 install -r $DRONE_WORKSPACE/ci/docker/install/requirements
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-python3
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_julia07
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-julia-0.7
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_julia10
+  depends_on:
+  - test-julia-0.7
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-julia-1.0
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_R
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-r
+- commands:
+  - /ci/stash_libs.sh cpu mx_lib_cython
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-openblas-make
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_openblas_make
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_onnx
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-onnx
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_scala
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-scala
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_clojure
+  depends_on:
+  - test-scala
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-clojure
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_cpu_clojure_integration
+  depends_on:
+  - test-clojure
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-clojure-integration
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_cpugpu_perl
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-perl
+- commands:
+  - /ci/stash_libs.sh cpu_make mx_lib_make
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-openblas-debug
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_debug
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-python3
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_cpp
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-cpp
+- commands:
+  - /ci/stash_libs.sh cpu_debug mx_cmake_lib_debug
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-mkl
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_mkl
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-python3
+- commands:
+  - /ci/stash_libs.sh cpu_mkl mx_lib
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-mkldnn-cmake
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-python3
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_minimal_R
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-r
+- commands:
+  - /ci/stash_libs.sh mkldnn_cpu mx_mkldnn_lib
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-mkldnn-make
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn_make
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh integrationtest_ubuntu_cpu_scala
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-scala
+- commands:
+  - /ci/stash_libs.sh mkldnn_cpu_make mx_mkldnn_lib_make
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-mkldnn-mkl
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_mkldnn_mkl
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu_mkldnn
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-python3
+- commands:
+  - /ci/stash_libs.sh mkldnn_mkl_cpu mx_mkldnn_lib
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-int64
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_large_tensor
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - /ci/stash_libs.sh ubuntu_cpu_int64 mx_cmake_lib
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-openblas-no-tvm-op
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_cpu_cmake_no_tvm_op
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_cpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:cpu
+  name: test-python3
+- commands:
+  - /ci/stash_libs.sh cpu_openblas_no_tvm_op mx_cmake_lib_no_tvm_op
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-static-scala
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_static_scala_cpu
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
+  name: compile
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-static-python
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_static_python_cpu
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
+  name: compile
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-cpu-static-python-cmake
+node:
+  hw: linuxcpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_static_python_cpu_cmake
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_cpu
+  name: compile
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-mkldnn
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+  name: test-python3
+- commands:
+  - /ci/stash_libs.sh mkldnn_gpu mx_mkldnn_lib
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-mkldnn-nocudnn
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_mkldnn_nocudnn
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_nocudnn
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-python3
+- commands:
+  - /ci/stash_libs.sh mkldnn_gpu_nocudnn mx_mkldnn_lib
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-full
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_python
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-python3-integration
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_quantization_gpu
+  depends_on:
+  - test-python3-integration
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-python3-quantize
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
+  depends_on:
+  - test-python3-quantize
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-python3
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_gpu_R
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-r
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_dist_kvstore
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-distributed-kvstore
+- commands:
+  - /ci/stash_libs.sh gpu mx_lib_cpp_examples
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-full-make
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_make
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_cpp_package
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-cpp
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_cpugpu_perl
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-perl
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_scala
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-scala
+- commands:
+  - /ci/stash_libs.sh gpu_make mx_lib_cpp_examples_make
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-cmake
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cmake
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_cpp
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-cpp
+- commands:
+  - /ci/stash_libs.sh cmake_gpu mx_cmake_lib_cython
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-tensorrt
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_tensorrt
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu-tensorrt
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_tensorrt_gpu
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu-tensorrt
+  name: test-python3
+- commands:
+  - /ci/stash_libs.sh tensorrt mx_tensorrt_lib
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-int64
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_large_tensor
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - /ci/stash_libs.sh ubuntu_gpu_int64 mx_cmake_lib
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-no-tvm
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_no_tvm_op
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh unittest_ubuntu_python3_gpu_cython
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-python3
+- commands:
+  - /ci/stash_libs.sh gpu_no_tvm_op mx_lib_cpp_examples_no_tvm_op
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-cmake-no-tvm
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_tvm_op
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-cmake-no-rtc
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cmake_no_rtc
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-mkldnn-cpp
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_ubuntu_gpu_cuda101_cudnn7_mkldnn_cpp_test
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: compile
+- commands:
+  - . /ci/setup_test_env.sh
+  - cd $FLAVOR_BUILD_DIR
+  - set
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - /ci/runtime_functions.sh integrationtest_ubuntu_gpu_capi_cpp_package
+  depends_on:
+  - compile
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  name: test-capi-cpp-package
+- commands:
+  - /ci/stash_libs.sh gpu_mkldnn_cpp_test_make mx_lib_cpp_capi_make
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-static-python
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_static_python_cu101
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
+  name: compile
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+clone:
+  disable: true
+depends_on:
+- sanity
+image_pull_secrets:
+- dockerconfigjson
+kind: pipeline
+name: unix-gpu-static-python-cmake
+node:
+  hw: linuxgpu
+platform:
+  arch: amd64
+  os: linux
+steps:
+- commands:
+  - /ci/get_source.sh
+  - /ci/setup_ccache.sh
+  - du -hs $DRONE_WORKSPACE_BASE/*
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: clone-src
+- commands:
+  - . /ci/setup_build_env.sh
+  - ls -liaF /work /drone
+  - cd $FLAVOR_BUILD_DIR
+  - ccache --zero-stats
+  - if [ -e /usr/bin/nvidia-smi ]; then /usr/bin/nvidia-smi; fi
+  - set
+  - /ci/runtime_functions.sh build_static_python_cu101_cmake
+  - ccache -s
+  - pwd && find $DRONE_WORKSPACE_BASE -name libmxnet.so
+  depends_on:
+  - clone-src
+  environment:
+    FLAVOR_BUILD_DIR: /drone/mxnet
+    NUMPROC: 3
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnet-ci/ubuntu1404_gpu
+  name: compile
+- commands:
+  - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
+  - /ci/cleanup_ccache.sh
+  depends_on:
+  - compile
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/buildtools
+  name: build-cleanup
+  when:
+    status:
+    - failure
+    - success
+type: docker
+workspace:
+  base: /drone
+  path: mxnet
+---
+kind: signature
+hmac: da8023f2a179bfdefe8808542e8c3a6575759955ebb00c087138e6447f23cc09
+
+...
