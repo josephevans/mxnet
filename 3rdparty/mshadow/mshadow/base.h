@@ -231,7 +231,7 @@ extern "C" {
 #define MSHADOW_USE_GLOG DMLC_USE_GLOG
 #endif  // MSHADOW_USE_GLOG
 
-#if DMLC_USE_CXX11
+#if MSHADOW_IN_CXX11
 #define MSHADOW_THROW_EXCEPTION noexcept(false)
 #define MSHADOW_NO_EXCEPTION  noexcept(true)
 #else
