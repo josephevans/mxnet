@@ -1221,7 +1221,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1234,7 +1234,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-cpp
 - commands:
   - . /ci/setup_test_env.sh
@@ -1247,7 +1247,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-perl
 - commands:
   - . /ci/setup_test_env.sh
@@ -1260,7 +1260,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-scala
 - commands:
   - /ci/stash_libs.sh gpu_make mx_lib_cpp_examples_make
@@ -1814,6 +1814,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: da8023f2a179bfdefe8808542e8c3a6575759955ebb00c087138e6447f23cc09
+hmac: d88d52c33c470156c535cf1185dac0589e9f7fd2604b3e137bec0b2fa3d212cf
 
 ...
