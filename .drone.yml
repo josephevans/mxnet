@@ -1035,7 +1035,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1048,7 +1048,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-python3
 - commands:
   - /ci/stash_libs.sh mkldnn_gpu_nocudnn mx_mkldnn_lib
@@ -1102,7 +1102,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1115,7 +1115,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-python3-integration
 - commands:
   - . /ci/setup_test_env.sh
@@ -1128,7 +1128,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-python3-quantize
 - commands:
   - . /ci/setup_test_env.sh
@@ -1141,7 +1141,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-python3
 - commands:
   - . /ci/setup_test_env.sh
@@ -1154,7 +1154,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-r
 - commands:
   - . /ci/setup_test_env.sh
@@ -1167,7 +1167,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-distributed-kvstore
 - commands:
   - /ci/stash_libs.sh gpu mx_lib_cpp_examples
@@ -1314,7 +1314,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1327,7 +1327,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-cpp
 - commands:
   - /ci/stash_libs.sh cmake_gpu mx_cmake_lib_cython
@@ -1448,7 +1448,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: compile
 - commands:
   - /ci/stash_libs.sh ubuntu_gpu_int64 mx_cmake_lib
@@ -1502,7 +1502,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: compile
 - commands:
   - . /ci/setup_test_env.sh
@@ -1515,7 +1515,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: test-python3
 - commands:
   - /ci/stash_libs.sh gpu_no_tvm_op mx_lib_cpp_examples_no_tvm_op
@@ -1622,7 +1622,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1604:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
   name: compile
 - commands:
   - ls -liaF $DRONE_WORKSPACE_BASE && du -hs $DRONE_WORKSPACE_BASE/* && df -h
@@ -1814,6 +1814,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: d88d52c33c470156c535cf1185dac0589e9f7fd2604b3e137bec0b2fa3d212cf
+hmac: 98865842e794473d27301e2b04f3fd1690eb9e2ff952f51496ac488f01ef0b25
 
 ...
