@@ -1154,7 +1154,7 @@ steps:
   environment:
     FLAVOR_BUILD_DIR: /drone/mxnet
     NUMPROC: 3
-  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu
+  image: 187885003319.dkr.ecr.us-west-2.amazonaws.com/mxnetci/ubuntu1804:gpu-r
   name: test-r
 - commands:
   - . /ci/setup_test_env.sh
@@ -1814,6 +1814,6 @@ workspace:
   path: mxnet
 ---
 kind: signature
-hmac: 98865842e794473d27301e2b04f3fd1690eb9e2ff952f51496ac488f01ef0b25
+hmac: db95a256350b865393d8fb4af55b77fb5f26a783344790717406d2b60bd9800a
 
 ...
