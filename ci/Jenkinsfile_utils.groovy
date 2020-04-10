@@ -261,42 +261,6 @@ def assign_node_labels(args) {
   NODE_UTILITY = args.utility
 }
 
-def sanity_build_running(pr) {
-    def retVal = "UNKNOWN"
-    try {
-        def ji = Jenkins.instance
-        def prSanityBuild = ji.getItem("mxnet-validation-joeev").getItem("sanity").getItem(pr)
-        if (prSanityBuild.isBuilding() || prSanityBuild.isInQueue()) {
-            echo "Sanity build " + prSanityBuild.getLastBuild().number + " currently running"
-            retVal = "RUNNING"
-        } else {
-            retVal = prSanityBuild.getLastBuild().result.toString()
-        }
-    } catch (checkError) {
-        echo "Caught exception trying to find sanity build for this PR, continuing build without delay."
-    }
-    return retVal
-}
-
-def wait_for_sanity_builds() {
-    if (env.CHANGE_ID && env.JOB_NAME.lastIndexOf("PR-") != -1) {
-        echo "This is a pull request (PR-${env.CHANGE_ID}), checking for running sanity build."
-        // sleep to make sure sanity job is created
-        sleep(10)
-        def PRNum = env.JOB_NAME.substring(env.JOB_NAME.lastIndexOf("PR-"))
-        def buildStatus = sanity_build_running(PRNum)
-        while (buildStatus.equals("RUNNING")) {
-            sleep(20)
-            buildStatus = sanity_build_running(PRNum)
-        }
-        echo "Sanity build result: " + buildStatus
-        if (buildStatus.equals("FAILURE") || buildStatus.equals("ABORTED")) {
-            error("Sanity build did not complete, aborting build pipeline.")
-        }
-        echo "Sanity build completed, starting build"
-    }
-}
-
 def main_wrapper(args) {
   // Main Jenkinsfile pipeline wrapper handler that allows to wrap core logic into a format
   // that supports proper failure handling

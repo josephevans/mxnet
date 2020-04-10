@@ -29,10 +29,6 @@ node('utility') {
   utils = load('ci/Jenkinsfile_utils.groovy')
   custom_steps = load('ci/jenkins/Jenkins_steps.groovy')
 }
-
-// wait for sanity build to complete before proceeding
-utils.wait_for_sanity_builds()
-
 utils.assign_node_labels(utility: 'utility', linux_cpu: 'mxnetlinux-cpu')
 
 utils.main_wrapper(
