@@ -38,8 +38,8 @@ def buildJobs = [
 
 
 stage("full-build") {
-    echo "JOB_NAME: " + JOB_NAME
-    def pipelineName = JOB_NAME.substring(0, JOB_NAME.lastIndexOf('/'))
+    def jobPath = JOB_NAME.split('/')
+    def pipelineName = jobPath[0..jobPath.size()-3].join('/')
     build job: pipelineName + "/sanity/" + BRANCH_NAME, wait: true
     buildJobs.each { subJob ->
         build job: pipelineName + "/" + subJob + "/" + BRANCH_NAME, wait: false
