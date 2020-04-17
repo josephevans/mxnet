@@ -1,0 +1,77 @@
+#cloud-config
+
+apt_reboot_if_required: false
+package_update: true
+package_upgrade: true
+apt:
+  sources:
+    docker.list:
+      source: deb [arch=amd64] https://download.docker.com/linux/ubuntu $RELEASE stable
+      keyid: 0EBFCD88
+    nvidia-container-runtime.list:
+      source: |
+        deb https://nvidia.github.io/libnvidia-container/ubuntu18.04/$(ARCH) /
+        deb https://nvidia.github.io/nvidia-container-runtime/ubuntu18.04/$(ARCH) /
+        deb https://nvidia.github.io/nvidia-docker/ubuntu18.04/$(ARCH) /
+      keyid: F796ECB0
+    nvidia-cuda-drivers.list:
+      source: |
+        deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64 /
+      keyid: 7FA2AF80
+    graphics-drivers-ppa:
+      source: "ppa:graphics-drivers/ppa"
+
+apt_get_command: ["apt-get", "--option=Dpkg::Options::=--force-confold", "--option=Dpkg::options::=--force-unsafe-io", "--assume-yes", "--quiet", "--install-recommends"]
+
+packages:
+  - docker-ce
+  - awscli
+  #- nvidia-docker2
+  #- nvidia-container-runtime
+  #- cuda-runtime-10-1
+  #- nvidia-driver-410
+  #
+  # working config with nvidia-docker2:
+  #- nvidia-docker2
+  #- nvidia-container-runtime
+  #- cuda-runtime-10-1
+  #
+  # for using new NVidia container toolkit, which won't work with drone until we
+  #  can pass arguments to docker when creating runner containers
+  #- nvidia-container-toolkit
+
+write_files:
+  - path: /etc/systemd/system/docker.service.d/override.conf
+    content: |
+      [Service]
+      ExecStart=
+      ExecStart=/usr/bin/dockerd
+  - path: /etc/default/docker
+    content: |
+      DOCKER_OPTS=""
+  - path: /etc/docker/daemon.json
+    content: |
+      {
+        "hosts": [ "0.0.0.0:2376", "unix:///var/run/docker.sock" ],
+        "tls": true,
+        "tlsverify": true,
+        "tlscacert": "/etc/docker/ca.pem",
+        "tlscert": "/etc/docker/server-cert.pem",
+        "tlskey": "/etc/docker/server-key.pem",
+        "default-shm-size": "500m",
+        "runtimes": {
+            "nvidia": {
+                "path": "/usr/bin/nvidia-container-runtime",
+                "runtimeArgs": []
+            }
+        },
+        "default-runtime": "nvidia"
+      }
+
+runcmd:
+  - [ "apt-get", "install", "-y", "nvidia-docker2", "nvidia-container-runtime" ]
+  - [ "apt-get", "install", "-y", "nvidia-driver-410" ]
+  #- [ "apt-get", "install", "-y", "cuda-runtime-10-1" ]
+  - [ "rm", "-f", "/var/lib/cloud/instances/*/sem/config_scripts_user", "/var/lib/cloud/instance/sem/config_scripts_user" ]
+  - [ "halt", "-p" ]
+

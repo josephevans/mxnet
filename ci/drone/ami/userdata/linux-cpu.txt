@@ -1,0 +1,40 @@
+#cloud-config
+
+apt_reboot_if_required: false
+package_update: false
+package_upgrade: false
+
+apt:
+  sources:
+    docker.list:
+      source: deb [arch=amd64] https://download.docker.com/linux/ubuntu $RELEASE stable
+      keyid: 0EBFCD88
+
+packages:
+  - docker-ce
+
+write_files:
+  - path: /etc/systemd/system/docker.service.d/override.conf
+    content: |
+      [Service]
+      ExecStart=
+      ExecStart=/usr/bin/dockerd
+  - path: /etc/default/docker
+    content: |
+      DOCKER_OPTS=""
+  - path: /etc/docker/daemon.json
+    content: |
+      {
+        "hosts": [ "0.0.0.0:2376", "unix:///var/run/docker.sock" ],
+        "default-shm-size": "500m",
+        "tls": true,
+        "tlsverify": true,
+        "tlscacert": "/etc/docker/ca.pem",
+        "tlscert": "/etc/docker/server-cert.pem",
+        "tlskey": "/etc/docker/server-key.pem"
+      }
+
+runcmd:
+  - [ "rm", "-f", "/var/lib/cloud/instances/*/sem/config_scripts_user", "/var/lib/cloud/instance/sem/config_scripts_user" ]
+  - [ "halt", "-p" ]
+
