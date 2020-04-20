@@ -38,6 +38,7 @@ def buildJobs = [
 
 
 stage("full-build") {
+    sleep(10)
     // get the base path by removing build and branch portions
     def jobPath = JOB_NAME.split('/')
     def pipelineName = jobPath[0..jobPath.size()-3].join('/')
