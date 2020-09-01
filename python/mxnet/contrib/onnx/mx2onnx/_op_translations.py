@@ -958,10 +958,11 @@ def convert_dropout(node, **kwargs):
     and return the created node.
     """
     name, input_nodes, attrs = get_inputs(node, kwargs)
+    opset_version = kwargs["opset_version"]
 
     probability = float(attrs.get("p", 0.5))
 
-    if onnx.defs.onnx_opset_version() >= 12:
+    if opset_version >= 12:
         # opset >= 12 requires the ratio to be an input
         initializer = kwargs["initializer"]
         ratio_input_name = name + "_ratio"
