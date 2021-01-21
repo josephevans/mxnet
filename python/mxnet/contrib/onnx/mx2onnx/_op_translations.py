@@ -2616,6 +2616,85 @@ def convert_slice(node, **kwargs):
 
     return nodes
 
+@mx_op.register("slice_like")
+def convert_slice_like(node, **kwargs):
+    """Map MXNet's slice_like operator to onnx Slice operator."""
+    from onnx.helper import make_node, make_tensor
+    from onnx import TensorProto
+
+    name, input_nodes, attrs = get_inputs(node, kwargs)
+
+    axes = attrs.get("axes", "None")
+    zero = make_tensor(name+"_zero", TensorProto.INT64, [1], [0])
+    maxval = make_tensor(name+"_maxval", TensorProto.INT64, [1], [2**63-1])
+    if axes != "None":
+        axes = list(map(int, re.findall(r'-?\d+', axes)))
+        print("JOE: axes: {}".format(axes))
+
+        '''
+        this doesn't work...
+        nodes = [
+            # first determine output shape based on 2nd input
+            make_node("Shape", [input_nodes[1]], [name+"_shape0"]),
+            make_node("Shape", [name+"_shape0"], [name+"_shape1"]),
+            make_node("ConstantOfShape", [name+"_shape1"], [name+"_data_start"], value=zero),
+            make_node("ConstantOfShape", [name+"_shape1"], [name+"_max"], value=maxval),
+            create_const_node(name+"_maxval", np.array([2**63-1], dtype='int64'), kwargs),
+            make_node("Size", [name+"_shape1"], [name+"_size0"])
+        ]
+
+        idx = 0
+        in_node = name+"_shape0"
+        for axis in axes:
+            prefix = name+"_axis"+str(idx)
+            nodes += [
+                create_const_node(prefix+"_val", np.array([axis], dtype='int64'), kwargs),
+                make_node("SequenceErase", [in_node, prefix+"_val"], [prefix+"_a"]),
+                make_node("SequenceInsert", [prefix+"_a", name+"_maxval", prefix+"_val"], [prefix+"_b"])
+            ]
+            in_node = prefix+"_b"
+            idx += 1
+
+        nodes += [
+            create_const_node(name+"_axes", np.array([x for x in range(len(axes))], dtype='int64'), kwargs),
+            make_node("Slice", [input_nodes[0], name+"_data_start", in_node, name+"_axes"], [name], name=name)
+
+        ]
+        '''
+
+        '''
+        #make_node("Shape", [name+"_shape0"], [name+"_shape1"]),
+        #make_node("ConstantOfShape", [name+"_shape1"], [name+"_data_start"], value=zero),
+
+        # next create tensors for axes variable
+        create_const_node(name+"_axes", np.array(axes, dtype='int64'), kwargs),
+        create_const_node(name+"_axes_start", np.array([0 for _ in axes], dtype='int64'), kwargs),
+        create_const_node(name+"_axes_end", np.array([2**63-1 for _ in axes], dtype='int64'), kwargs),
+
+        # slice input data
+        make_node("Slice", [input_nodes[0], name+"_axes_start", name+"_axes_end", name+"_axes"], [name+"_slice1"]),
+
+        # slice the input 2 shape
+        make_node("Slice", [name+"_shape0", name+"_axes_start", name+"_axes_end", name+"_axes"], [name+"_slice0"]),
+        make_node("Shape", [name+"_slice0"], [name+"_shape2"]),
+        make_node("ConstantOfShape", [name+"_shape2"], [name+"_data_start"], value=zero),
+
+
+        # now slice input with intended output shape
+        make_node("Slice", [name+"_slice1", name+"_data_start", name+"_slice0"], [name], name=name)
+        '''
+
+    else:
+        # this case works fine
+        nodes = [
+            make_node("Shape", [input_nodes[1]], [name+"_shape"]),
+            make_node("Shape", [name+"_shape"], [name+"_shape2"]),
+            make_node("ConstantOfShape", [name+"_shape2"], [name+"_starts"], value=zero),
+            make_node("Slice", [input_nodes[0], name+"_starts", name+"_shape"], [name], name=name)
+        ]
+
+    return nodes
+
 
 @mx_op.register("zeros_like")
 def convert_zeros_like(node, **kwargs):

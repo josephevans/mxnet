@@ -201,6 +201,24 @@ def test_onnx_export_slice_axis(tmp_path, dtype):
     op_export_test('slice_axis_3', M3, [x], tmp_path)
 
 
+@pytest.mark.parametrize("dtype", ["float16", "float32", "float64", "int32", "int64"])
+@pytest.mark.parametrize("shape", [(4,5), (10,20)])
+@pytest.mark.parametrize("axes", [None, [0,1], [0], [-1]])
+def test_onnx_export_slice_like(tmp_path, dtype, axes, shape):
+    if axes != None:
+        M = def_model('slice_like', axes=axes)
+    else:
+        M = def_model('slice_like')
+    if 'float' in dtype:
+        x = mx.nd.random.uniform(0, 1, shape, dtype=dtype)
+    else:
+        x = mx.nd.random.randint(0, 1, shape, dtype=dtype)
+    #x = mx.nd.arange(start=0, stop=60, dtype=dtype).reshape(shape)
+    #x = mx.nd.array(mx.nd.arange(shape), dtype=dtype)
+    y = mx.nd.zeros((2,3), dtype=dtype)
+    op_export_test('slice_like', M, [x, y], tmp_path)
+
+
 @pytest.mark.parametrize('dtype', ['float32', 'float64', 'int32', 'int64'])
 def test_onnx_export_reshape(tmp_path, dtype):
     x = mx.nd.ones((2, 3, 4, 5, 6), dtype=dtype)
