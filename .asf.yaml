@@ -30,22 +30,7 @@ github:
           - ci/jenkins/mxnet-validation/website
           - ci/jenkins/mxnet-validation/windows-cpu
           - ci/jenkins/mxnet-validation/windows-gpu
-    v1.x:
-      required_status_checks:
-        strict: true
-        contexts:
-          - ci/jenkins/mxnet-validation/centos-cpu
-          - ci/jenkins/mxnet-validation/centos-gpu
-          - ci/jenkins/mxnet-validation/clang
-          - ci/jenkins/mxnet-validation/edge
-          - ci/jenkins/mxnet-validation/miscellaneous
-          - ci/jenkins/mxnet-validation/sanity
-          - ci/jenkins/mxnet-validation/unix-cpu
-          - ci/jenkins/mxnet-validation/unix-gpu
-          - ci/jenkins/mxnet-validation/website
-          - ci/jenkins/mxnet-validation/windows-cpu
-          - ci/jenkins/mxnet-validation/windows-gpu
-    v1.8.x:
+    v1.*x:
       required_status_checks:
         strict: true
         contexts:
